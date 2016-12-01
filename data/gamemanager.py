@@ -1,3 +1,4 @@
+__author__ = "kiel.regusters"
 from . import debug as info
 from . import init
 from . import spritesheet

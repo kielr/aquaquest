@@ -1,6 +1,7 @@
 from . import init
 from . import gamemanager
 from . states import main_menu
+__author__ = "kiel.regusters"
 from . import constants as c
 def main():
 	""" Sets up screen states. """

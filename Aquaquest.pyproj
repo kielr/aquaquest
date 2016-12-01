@@ -40,6 +40,9 @@
     <Compile Include="data\load.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="data\soundmanager.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="data\spritesheet.py">
       <SubType>Code</SubType>
     </Compile>

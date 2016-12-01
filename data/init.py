@@ -13,6 +13,7 @@ os.environ["SDL_VIDEO_CENTERED"] = "1"
 
 # Initialize the pygame environment
 pg.init()
+pg.mixer.init(48000, -16, 1, 1024)
 
 # Control which kind of events we see in the event queue
 #pg.event.set_allowed([pg.KEYDOWN, pg.KEYUP, pg.QUIT])
@@ -25,6 +26,12 @@ SCREEN = pg.display.set_mode((800, 600))
 SCREEN_RECTANGLE = SCREEN.get_rect()
 
 # Load content
+
+# Music
+BGM = load.load_all_music(os.path.join("resources","music"))
+
+# SFX
+SFX = load.load_all_sfx(os.path.join("resources", "sfx"))
 
 # Map Tilesets
 TILESETS = load.load_all_gfx(os.path.join("resources", "tilesets"))

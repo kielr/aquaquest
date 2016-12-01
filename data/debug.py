@@ -1,3 +1,4 @@
+__author__ = "kiel.regusters"
 """
 Simple module to print debug information.
 """

@@ -1,3 +1,4 @@
+__author__ = "kiel.regusters"
 """
 This module contains the class for the main states used in the game.
 """

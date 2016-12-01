@@ -1,3 +1,4 @@
+__author__ = "kiel.regusters"
 """
 Module that contains classes that make it easy to draw the map, and its characters/animations.
 """

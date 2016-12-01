@@ -2,6 +2,9 @@ import pygame as pg
 from .. import constants as c
 from .. import state
 from .. import init
+from .. import utility
+from .. import soundmanager
+import time
 
 class Menu(state.State):
 	def __init__(self):
@@ -10,7 +13,11 @@ class Menu(state.State):
 
 	def StartUp(self):
 		""" Called everytime we switch to this state """
+		self.overhead = utility.Overhead(c.MAIN_MENU)
+		self.sound = soundmanager.Sound(self.overhead)
 		self.titlescreen = init.GRAPHICS['title']
+		self.fadeInSurface = pg.display.set_mode(c.SCREEN_SIZE)
+		self.fadeInSurface.fill((0,0,0))
 		self.SetupCursor()
 
 	def SetupCursor(self):
@@ -33,7 +40,7 @@ class Menu(state.State):
 		rect.y = dest[1]
 
 		return (image, rect)
-
+	#
 	def UpdateCursor(self, keys, events):
 		positions = [275, 340, 400]
 		input_list = [pg.K_SPACE, pg.K_RETURN, pg.K_e, pg.K_f]
@@ -41,27 +48,36 @@ class Menu(state.State):
 			if event.type == pg.KEYDOWN:
 				if self.cursor.state == c.PLAY:
 					if keys[pg.K_s]:
+						self.sound.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[1]
 						self.cursor.state = c.LOAD
 					elif keys[pg.K_w]:
+						self.sound.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[2]
 						self.cursor.state = c.QUIT
 				elif self.cursor.state == c.LOAD:
 					if keys[pg.K_s]:
+						self.sound.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[2]
 						self.cursor.state = c.QUIT
 					elif keys[pg.K_w]:
+						self.sound.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[0]
 						self.cursor.state = c.PLAY
 				else:
 					if keys[pg.K_s]:
+						self.sound.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[0]
 						self.cursor.state = c.PLAY
 					elif keys[pg.K_w]:
+						self.sound.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[1]
 						self.cursor.state = c.LOAD
 					for input in input_list:
 						if keys[input]:
+							self.sound.sfx['cursor_select'].play()
+							time.sleep(1)
+							self.sound.StopBGM()
 							self.quit = True
 							self.done = True
 

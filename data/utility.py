@@ -1,3 +1,4 @@
+__author__ = "kiel.regusters"
 import pygame as pg
 from . import init
 
