@@ -19,6 +19,7 @@ class GameManager(object):
 		self.fps = 60
 		self.keys = pg.key.get_pressed()
 		self.stateDict = {}
+		self.currentTime = 0.0
 		self.stateName = None
 		self.state = None
 
@@ -57,8 +58,16 @@ class GameManager(object):
 		self.state.Update(self.screen, self.keys, self.currentTime, events)
 
 	def FlipState(self):
-		pass
-
+		""" When a state finishes, this method is called to transition the game to the next state, whatever it may be."""
+		# Keep the current state and the next state in memory 
+		previous, self.stateName = self.stateName, self.state.next
+		# Clean up the state
+		self.state.Clean()
+		self.state = self.stateDict[self.stateName]
+		self.state.StartUp(self.currentTime)
+		self.previous = previous
+		
+	
 	## How to blit the map:
 	#for layer in test.layers:
 	#	for x,y,image in layer.tiles():
@@ -72,7 +81,6 @@ class GameManager(object):
 			events = pg.event.get()
 			self.HandleEvents(events)
 			self.Update(events)
-			test = load_pygame("resources/maps/test.tmx")
 
 
 			pg.display.update()

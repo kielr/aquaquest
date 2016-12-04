@@ -54,6 +54,9 @@
     <Compile Include="data\state.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="data\states\load_screen.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="data\states\main_menu.py">
       <SubType>Code</SubType>
     </Compile>
@@ -61,6 +64,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\utility.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="data\states\world.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\__init__.py">
@@ -76,7 +82,7 @@
     <Folder Include="resources\tilesets\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="resources\maps\test.tmx" />
+    <Content Include="resources\maps\level1.tmx" />
     <Content Include="resources\tilesets\cave.png" />
   </ItemGroup>
   <PropertyGroup>

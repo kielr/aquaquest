@@ -7,4 +7,5 @@ DEBUG = True
 
 def debug(string):
 	if DEBUG:
+		print("DEBUG = ", end="")
 		print(string)

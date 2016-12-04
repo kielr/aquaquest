@@ -4,17 +4,17 @@ from .. import state
 from .. import init
 from .. import utility
 from .. import soundmanager
-import time
+from .. import debug
 
 class Menu(state.State):
 	def __init__(self):
 		state.State.__init__(self)
-		self.StartUp()
+		self.StartUp(0.0)
 
-	def StartUp(self):
+	def StartUp(self, currentTime):
 		""" Called everytime we switch to this state """
 		self.overhead = utility.Overhead(c.MAIN_MENU)
-		self.sound = soundmanager.Sound(self.overhead)
+		self.soundManager = soundmanager.Sound(self.overhead)
 		self.titlescreen = init.GRAPHICS['title']
 		self.fadeInSurface = pg.display.set_mode(c.SCREEN_SIZE)
 		self.fadeInSurface.fill((0,0,0))
@@ -48,36 +48,47 @@ class Menu(state.State):
 			if event.type == pg.KEYDOWN:
 				if self.cursor.state == c.PLAY:
 					if keys[pg.K_s]:
-						self.sound.sfx['cursor_move'].play()
+						self.soundManager.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[1]
 						self.cursor.state = c.LOAD
 					elif keys[pg.K_w]:
-						self.sound.sfx['cursor_move'].play()
+						self.soundManager.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[2]
 						self.cursor.state = c.QUIT
+					for input in input_list:
+						if keys[input]:
+							self.soundManager.sfx['cursor_select'].play()
+							debug.debug("Stopping music")
+							self.soundManager.StopBGM()
+							debug.debug("Play selected.")
+							debug.debug("Set the next state to a load screen")
+							self.done = True
+							self.next = c.LOAD_SCREEN
+							pg.time.wait(1000)
 				elif self.cursor.state == c.LOAD:
 					if keys[pg.K_s]:
-						self.sound.sfx['cursor_move'].play()
+						self.soundManager.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[2]
 						self.cursor.state = c.QUIT
 					elif keys[pg.K_w]:
-						self.sound.sfx['cursor_move'].play()
+						self.soundManager.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[0]
 						self.cursor.state = c.PLAY
 				else:
 					if keys[pg.K_s]:
-						self.sound.sfx['cursor_move'].play()
+						self.soundManager.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[0]
 						self.cursor.state = c.PLAY
 					elif keys[pg.K_w]:
-						self.sound.sfx['cursor_move'].play()
+						self.soundManager.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[1]
 						self.cursor.state = c.LOAD
 					for input in input_list:
 						if keys[input]:
-							self.sound.sfx['cursor_select'].play()
-							time.sleep(1)
-							self.sound.StopBGM()
+							self.soundManager.sfx['cursor_select_quit'].play()
+							debug.debug("Player quit.")
+							pg.time.wait(1000)
+							self.soundManager.StopBGM()
 							self.quit = True
 							self.done = True
 

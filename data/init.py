@@ -1,7 +1,7 @@
-__author__ = "kielregusters"
+__author__ = "kiel.regusters"
 
 """
-Initializes display and will eventually create dictionaries of all content that will be used
+Initializes display and will create dictionaries of all content that will be used
 """
 import os
 import pygame as pg
@@ -12,8 +12,8 @@ from . import debug
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 
 # Initialize the pygame environment
+pg.mixer.pre_init(44100, -16, 1, 512)
 pg.init()
-pg.mixer.init(48000, -16, 1, 1024)
 
 # Control which kind of events we see in the event queue
 #pg.event.set_allowed([pg.KEYDOWN, pg.KEYUP, pg.QUIT])

@@ -173,7 +173,7 @@ class TiledElement(object):
         for k, v in items:
             # i'm not sure why, but this has attr causes problems on python 2.7 with unicode
             try:
-                # this will be called in py 3+
+                # this will be called in py 3
                 _hasattr = hasattr(self, k)
             except UnicodeError:
                 # this will be called in py 2.7
