@@ -9,8 +9,8 @@ MAX_VEL_X = 10
 MAX_VEL_Y = 20
 GRAVITY = 1
 JUMP_GRAVITY = 0.5
-JUMP_VEL = -10
-DOUBLE_JUMP_VEL = -10
+JUMP_VEL = -7
+DOUBLE_JUMP_VEL = -7
 
 # Player states
 WALKING = "walking"
@@ -18,9 +18,11 @@ IDLE = "idle"
 FALLING = "falling"
 JUMP = "jump"
 DOUBLEJUMP = "djump"
+NOTATTACKING = "noattack"
+ATTACKING = "attack"
 
 # Player forces
-ACCEL = 1
+ACCEL = 0.5
 
 # Game States
 MAIN_MENU = "main menu"

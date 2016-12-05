@@ -10,10 +10,6 @@ class Camera(object):
 		self.viewport = init.SCREEN.get_rect()
 		self.x = self.viewport.x
 		self.y = self.viewport.y
-		self.right = self.x + self.viewport.width
-		self.bottom = self.y + self.viewport.height
-		self.left = self.x
-		self.top = self.y
 		self.orgX = self.viewport.centerx
 		self.orgY = self.viewport.centery
 		self.limitRect = None

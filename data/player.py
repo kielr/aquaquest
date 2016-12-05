@@ -6,13 +6,19 @@ from itertools import cycle
 keybinding = {
 	'left':pg.K_a,
 	'right':pg.K_d,
-	'jump':pg.K_SPACE
+	'jump':pg.K_SPACE,
+	'melee':pg.K_e
 }
 
 class Player(pg.sprite.Sprite):
 	def __init__(self):
 		pg.sprite.Sprite.__init__(self)
 		self.spriteSheet = init.GRAPHICS['character']
+		self.weaponImage = init.GRAPHICS['weapon']
+		self.weaponImage.set_colorkey((255, 0, 255))
+		self.weaponRect = self.weaponImage.get_rect()
+		self.weaponImage = pg.transform.scale(self.weaponImage,
+							  (int(self.weaponRect.width * c.ZOOM * 2), int(self.weaponRect.height * c.ZOOM * 2)))
 		self.anims = {}
 		self.velX = 0
 		self.velY = 0
@@ -26,13 +32,21 @@ class Player(pg.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.facingRight = True
 		self.allowJump = True
+		self.allowAttack = True
+		self.meleeActive = False
 		self.allowJumpPrev = self.allowJump
 		self.state = c.IDLE
+		self.attackState = c.NOTATTACKING
 		self.frameIndex = 0
 		self.switchIndex = 10
 		self.switchCounter = 0
+		self.meleeCounter = 0
+		self.meleeTime = 10
 		self.relX = 0
 		self.relY = 0
+		self.STR = 1
+		self.INT = 1
+		self.DEX = 1
 
 	def LoadFrames(self):
 		spriteSheetRect = self.spriteSheet.get_rect()
@@ -61,15 +75,17 @@ class Player(pg.sprite.Sprite):
 	
 	def HandleState(self, keys, events):
 		if self.state == c.IDLE:
-			self.Idle(keys)
+			self.Idle(keys,events)
 		elif self.state == c.WALKING:
-			self.Walking(keys)
+			self.Walking(keys, events)
 		elif self.state == c.JUMP:
 			self.Jumping(keys, events)
 		elif self.state == c.DOUBLEJUMP:
-			self.DoubleJump(keys)
+			self.DoubleJump(keys, events)
+		if self.attackState == c.ATTACKING:
+			self.Attacking()
 
-	def Idle(self, keys):
+	def Idle(self, keys, events):
 		"""
 		Called when the player is no longer walking, or called by default
 		"""
@@ -83,14 +99,21 @@ class Player(pg.sprite.Sprite):
 			self.facingRight = True
 			self.frameIndex = next(self.anims['walk-right'])
 			self.state = c.WALKING
-		elif keys[keybinding['jump']] and self.allowJump:
-			self.state = c.JUMP
-			init.SFX['jump'].play()
-			self.velY = c.JUMP_VEL
 		else:
 			self.state = c.IDLE
 
-	def Walking(self, keys):
+		for event in events:
+			if event.type == pg.KEYDOWN and self.allowJump:
+				if keys[keybinding['jump']]:
+					self.state = c.JUMP
+					self.velY = c.JUMP_VEL
+					init.SFX['jump'].play()
+			if event.type == pg.KEYDOWN and self.allowAttack:
+				if keys[keybinding['melee']]:
+					self.attackState = c.ATTACKING
+					init.SFX['attack'].play()
+
+	def Walking(self, keys, events):
 		self.velY += self.gravity
 
 		if(self.switchCounter == self.switchIndex):
@@ -108,18 +131,18 @@ class Player(pg.sprite.Sprite):
 			self.switchCounter += 1
 		if keys[keybinding['left']]:
 			self.facingRight = False
-			self.accelX = c.ACCEL
-			if self.velX > (self.maxVelX * -1):
+			self.accelX = c.ACCEL + (self.DEX / 2)
+			if self.velX > (-self.maxVelX - self.DEX / 2):
 				self.velX -= self.accelX
-			elif self.velX < (self.maxVelX * -1):
-				self.velX += self.accelX
+			elif self.velX <= (-self.maxVelX - self.DEX / 2):
+				self.velX = -self.maxVelX - self.DEX / 2
 		elif keys[keybinding['right']]:
 			self.facingRight = True
-			self.accelX = c.ACCEL
-			if self.velX < self.maxVelX:
+			self.accelX = c.ACCEL + (self.DEX / 2)
+			if self.velX < self.maxVelX + self.DEX / 2:
 				self.velX += self.accelX
-			elif self.velX > self.maxVelX:
-				self.velX -= self.accelX
+			elif self.velX > self.maxVelX + self.DEX / 2:
+				self.velX = self.maxVelX + self.DEX / 2
 		else:
 			self.switchCounter = 0
 			self.state = c.IDLE
@@ -127,30 +150,37 @@ class Player(pg.sprite.Sprite):
 				self.frameIndex = self.anims['idle-right'][0]
 			else:
 				self.frameIndex = self.anims['idle-left'][0]
-		if keys[keybinding['jump']] and self.allowJump:
-			self.state = c.JUMP
-			init.SFX['jump'].play()
-			self.velY = c.JUMP_VEL
+		for event in events:
+			if event.type == pg.KEYDOWN and self.allowJump:
+				if keys[keybinding['jump']]:
+					self.state = c.JUMP
+					self.velY = c.JUMP_VEL
+					init.SFX['jump'].play()
+			if event.type == pg.KEYDOWN and self.allowAttack:
+				if keys[keybinding['melee']]:
+					self.attackState = c.ATTACKING
+					init.SFX['attack'].play()
 
 	def Jumping(self, keys, events):
 		self.allowJump = False
 		self.gravity = c.JUMP_GRAVITY
 		self.velY += self.gravity
+		self.velY += -0.2
 
 		if(self.velY > 0 and self.velY < self.maxVelY):
 			self.state = c.WALKING
 			self.gravity = c.GRAVITY
 
 		if keys[keybinding['left']] and self.state == c.JUMP:
-			if self.velX > (self.maxVelX * -1):
-				self.velX -= self.accelX
-			elif self.velX < (self.maxVelX * -1):
-				self.velX += self.accelX
+			if self.velX > (self.maxVelX * -1 - self.DEX / 2):
+				self.velX -= self.accelX + self.DEX / 2
+			elif self.velX < (self.maxVelX * -1 - self.DEX / 2):
+				self.velX = self.maxVelX * -1 - self.DEX / 2
 		if keys[keybinding['right']] and self.state == c.JUMP:
-			if self.velX < self.maxVelX:
-				self.velX += self.accelX
-			elif self.velX > self.maxVelX:
-				self.velX -= self.accelX
+			if self.velX < self.maxVelX + self.DEX / 2 :
+				self.velX += self.accelX + self.DEX / 2 
+			elif self.velX > self.maxVelX + self.DEX / 2 :
+				self.velX = self.maxVelX + self.DEX / 2  
 
 		for event in events:
 			if event.type == pg.KEYDOWN:
@@ -158,25 +188,47 @@ class Player(pg.sprite.Sprite):
 					self.state = c.DOUBLEJUMP
 					self.velY = c.DOUBLE_JUMP_VEL
 					init.SFX['doublejump'].play()
+			if event.type == pg.KEYDOWN and self.allowAttack:
+				if keys[keybinding['melee']]:
+					self.attackState = c.ATTACKING
+					init.SFX['attack'].play()
 	
-	def DoubleJump(self, keys):
+	def DoubleJump(self, keys, events):
 		self.gravity = c.JUMP_GRAVITY
 		self.velY += self.gravity
-
+		self.velY += -0.2
 		if(self.velY > 0 and self.velY < self.maxVelY):
 			self.state = c.WALKING
 			self.gravity = c.GRAVITY
 
 		if keys[keybinding['left']] and self.state == c.DOUBLEJUMP:
-			if self.velX > (self.maxVelX * -1):
-				self.velX -= self.accelX
-			elif self.velX < (self.maxVelX * -1):
-				self.velX += self.accelX
+			if self.velX > (self.maxVelX * -1 - self.DEX / 2):
+				self.velX -= self.accelX + self.DEX / 2
+			elif self.velX < (self.maxVelX * -1 - self.DEX / 2):
+				self.velX = self.maxVelX * -1 - self.DEX / 2
 		if keys[keybinding['right']] and self.state == c.DOUBLEJUMP:
-			if self.velX < self.maxVelX:
-				self.velX += self.accelX
-			elif self.velX > self.maxVelX:
-				self.velX -= self.accelX
+			if self.velX < self.maxVelX + self.DEX / 2 :
+				self.velX += self.accelX + self.DEX / 2 
+			elif self.velX > self.maxVelX + self.DEX / 2 :
+				self.velX = self.maxVelX + self.DEX / 2
+
+		for event in events:
+			if event.type == pg.KEYDOWN and self.allowAttack:
+				if keys[keybinding['melee']]:
+					self.attackState = c.ATTACKING
+					init.SFX['attack'].play()
+
+	def Attacking(self):
+		self.meleeActive = True
+		self.allowAttack = False
+		if self.meleeCounter == self.meleeTime:
+			self.meleeActive = False
+			self.allowAttack = True
+			self.attackState = c.NOTATTACKING
+			self.meleeCounter = 0
+		else:
+			self.meleeCounter += 1
+
 
 	def Animation(self):
 		self.image = self.frames[self.frameIndex]

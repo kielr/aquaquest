@@ -155,11 +155,11 @@ class World(state.State):
 		self.player.rect.y = self.player.relY - self.camera.y
 	
 	def UpdateCameraX(self):
-		## Look at the player
-		#if self.player.facingRight:
-		#	self.camera.LookAtX(self.player.relX)
-		#else:
-		#	self.camera.LookAtX(self.player.relX)
+		# Look at the player
+		if self.player.facingRight:
+			self.camera.LookAtX(self.player.relX)
+		else:
+			self.camera.LookAtX(self.player.relX)
 		third = self.camera.viewport.x + self.camera.viewport.w//3
 		third_right = third * 2
 
@@ -200,7 +200,17 @@ class World(state.State):
 
 		# Draw to the surface
 		surface.blit(self.levelSurface, (0,0), [0 + self.camera.x, 0+self.camera.y, self.camera.viewport.width, self.camera.viewport.height])
+		# Draw player
 		self.playerGroup.draw(surface)
+		# Draw weapon if active
+		if self.player.meleeActive:
+			if self.player.facingRight:
+				surface.blit(self.player.weaponImage, [self.player.rect.x + 45, self.player.rect.y - 25, self.player.rect.w, self.player.rect.h])
+			else:
+				surface.blit(pg.transform.flip(self.player.weaponImage, True, False), 
+				 [self.player.rect.x - 95, self.player.rect.y - 25, self.player.rect.w, self.player.rect.h])
+
+
 		if debug.DEBUG_DRAW:
 			pg.draw.rect(surface, (255, 0, 0), self.player.rect)
 			for sprites in self.levelGroup.sprites():
