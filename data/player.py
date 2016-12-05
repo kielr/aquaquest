@@ -26,6 +26,7 @@ class Player(pg.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.facingRight = True
 		self.allowJump = True
+		self.allowJumpPrev = self.allowJump
 		self.state = c.IDLE
 		self.frameIndex = 0
 		self.switchIndex = 10
@@ -94,12 +95,14 @@ class Player(pg.sprite.Sprite):
 
 		if(self.switchCounter == self.switchIndex):
 			if self.facingRight:
-				self.frameIndex = next(self.anims['walk-right'])
-				init.SFX['footstep'].play()
+				if self.allowJump:
+					self.frameIndex = next(self.anims['walk-right'])
+					init.SFX['footstep'].play()
 				self.switchCounter = 0
 			else:
-				self.frameIndex = next(self.anims['walk-left'])
-				init.SFX['footstep'].play()
+				if self.allowJump:
+					self.frameIndex = next(self.anims['walk-left'])
+					init.SFX['footstep'].play()
 				self.switchCounter = 0
 		else:
 			self.switchCounter += 1

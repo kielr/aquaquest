@@ -87,9 +87,9 @@ class World(state.State):
 		self.player.Update(keys, events)
 		self.MovePlayerX()
 		self.CheckPlayerXLevelCollisions()
+		self.UpdateCameraX()
 		self.MovePlayerY()
 		self.CheckPlayerYLevelCollisions()
-		self.UpdateCameraX()
 		self.UpdateCameraY()
 
 	def MovePlayerX(self):
@@ -155,11 +155,18 @@ class World(state.State):
 		self.player.rect.y = self.player.relY - self.camera.y
 	
 	def UpdateCameraX(self):
-		# Look at the player
-		if self.player.facingRight:
-			self.camera.LookAtX(self.player.relX)
-		else:
-			self.camera.LookAtX(self.player.relX)
+		## Look at the player
+		#if self.player.facingRight:
+		#	self.camera.LookAtX(self.player.relX)
+		#else:
+		#	self.camera.LookAtX(self.player.relX)
+		third = self.camera.viewport.x + self.camera.viewport.w//3
+		third_right = third * 2
+
+		if self.player.rect.centerx >= third_right:
+			self.camera.Move(self.player.velX,0)
+		if self.player.rect.centerx <= third and self.player.velX <= 0:
+			self.camera.Move(self.player.velX, 0)
 
 	def UpdateCameraY(self):
 		# Look at the player
@@ -167,6 +174,14 @@ class World(state.State):
 			self.camera.LookAtY(self.player.relY + 75)
 		else:
 			self.camera.LookAtY(self.player.relY + 75)
+		#half = self.camera.viewport.y + self.camera.viewport.h//2
+		#third = self.camera.viewport.y + self.camera.viewport.h//3
+		#third_right = third * 2
+
+		#if self.player.rect.centery >= half:
+		#	self.camera.Move(0,self.player.velY)
+		#if self.player.rect.centery <= third_right and self.player.velY <= 0:
+		#	self.camera.Move(0, self.player.velY)
 
 	def DrawLevel(self):
 		self.levelSurface.fill(c.BLACK)
