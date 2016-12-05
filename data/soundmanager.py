@@ -13,11 +13,13 @@ class Sound(object):
 	"""
 	Sound manager that handles the playing of music.
 	"""
-	def __init__(self, overhead):
+	def __init__(self, overhead=None):
 		self.music_dict = init.BGM
 		self.sfx = init.SFX
 		self.overhead = overhead
-		self.MixerStartup()
+		if overhead != None:
+			self.MixerStartup()
+
 
 	def MixerStartup(self):
 		""" Plays the correct BGM depending on the state of the game. """
@@ -40,3 +42,6 @@ class Sound(object):
 	def StopBGM(self):
 		""" Simply stops all playback for music when called. """
 		pg.mixer.music.stop()
+
+	def Update(self):
+		pass

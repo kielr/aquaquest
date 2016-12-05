@@ -67,11 +67,6 @@ class GameManager(object):
 		self.state.StartUp(self.currentTime)
 		self.previous = previous
 		
-	
-	## How to blit the map:
-	#for layer in test.layers:
-	#	for x,y,image in layer.tiles():
-	#		self.screen.blit(image, [16 * x, 16 * y])
 
 	# Blit the title
 	def main(self):

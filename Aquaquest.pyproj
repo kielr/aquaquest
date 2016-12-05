@@ -23,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="aquaquest_play.py" />
+    <Compile Include="data\camera.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="data\constants.py">
       <SubType>Code</SubType>
     </Compile>
@@ -38,6 +41,9 @@
     <Compile Include="data\libs\pytmx.py" />
     <Compile Include="data\libs\six.py" />
     <Compile Include="data\load.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="data\player.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\soundmanager.py">
