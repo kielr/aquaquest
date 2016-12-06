@@ -12,6 +12,13 @@ from .. import init
 from .. import camera
 from .. import player
 
+newGameInfo = { "HP": 100, 
+				"LVL": 1,
+				"STR": 1,
+				"DEX": 1,
+				"INT": 1,
+				"XP": 0 }
+
 class World(state.State):
 	""" 
 	This class holds the TMX map and handles collision between entities inside the map.
@@ -39,6 +46,13 @@ class World(state.State):
 		#Draw to Level surface
 		self.DrawLevel()
 
+	def Continue(self, currentTime, game_info, level):
+		newGameInfo = game_info
+		self.SpawnPlayer()
+		self.SetUpSpriteGroups()
+		#Draw to Level surface
+		self.DrawLevel()
+
 	def SetUpSpriteGroups(self):
 		self.playerGroup = pg.sprite.Group(self.player)
 		self.SetUpSolidGroup()
@@ -61,7 +75,7 @@ class World(state.State):
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
 		self.playerX = playerSpawnObject.x
 		self.playerY = playerSpawnObject.y
-		self.player = player.Player()
+		self.player = player.Player(newGameInfo)
 		self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
 		self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
 		self.player.relX = self.playerX * c.ZOOM
@@ -69,6 +83,9 @@ class World(state.State):
 
 
 	def Update(self, surface, keys, currentTime, events):
+
+		if keys[pg.K_f]:
+			self.player.XP += 1
 
 		# Handle States
 		self.HandleStates(keys, events)
@@ -91,6 +108,7 @@ class World(state.State):
 		self.MovePlayerY()
 		self.CheckPlayerYLevelCollisions()
 		self.UpdateCameraY()
+		self.overhead.Update(self.player.info)
 
 	def MovePlayerX(self):
 		self.player.relX += self.player.velX
@@ -211,7 +229,17 @@ class World(state.State):
 				 [self.player.rect.x - 95, self.player.rect.y - 25, self.player.rect.w, self.player.rect.h])
 
 
+		# Draw overhead info
+		self.overhead.draw(surface)
 		if debug.DEBUG_DRAW:
 			pg.draw.rect(surface, (255, 0, 0), self.player.rect)
 			for sprites in self.levelGroup.sprites():
 				pg.draw.rect(surface, (255,0,0), sprites.rect)
+			
+			if self.player.attackState == c.ATTACKING:
+				if self.player.facingRight:
+					pg.draw.rect(surface, (255,0,0), [self.player.rect.x + 50, self.player.rect.y + 23,
+									  self.player.weaponHbox.w, self.player.weaponHbox.h])
+				else:
+					pg.draw.rect(surface, (255,0,0), [self.player.rect.x - 71, self.player.rect.y + 23,
+									  self.player.weaponHbox.w, self.player.weaponHbox.h])

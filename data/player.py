@@ -11,42 +11,58 @@ keybinding = {
 }
 
 class Player(pg.sprite.Sprite):
-	def __init__(self):
+	def __init__(self, info):
 		pg.sprite.Sprite.__init__(self)
 		self.spriteSheet = init.GRAPHICS['character']
-		self.weaponImage = init.GRAPHICS['weapon']
-		self.weaponImage.set_colorkey((255, 0, 255))
-		self.weaponRect = self.weaponImage.get_rect()
-		self.weaponImage = pg.transform.scale(self.weaponImage,
-							  (int(self.weaponRect.width * c.ZOOM * 2), int(self.weaponRect.height * c.ZOOM * 2)))
 		self.anims = {}
-		self.velX = 0
-		self.velY = 0
-		self.maxVelX = c.MAX_VEL_X
-		self.maxVelY = c.MAX_VEL_Y
-		self.gravity = c.GRAVITY
-		self.accelX = c.ACCEL
-		self.LoadFrames()
-		self.SetUpAnimations()
-		self.image = self.frames[self.anims['idle-right'][0]]
-		self.rect = self.image.get_rect()
 		self.facingRight = True
 		self.allowJump = True
-		self.allowAttack = True
-		self.meleeActive = False
 		self.allowJumpPrev = self.allowJump
 		self.state = c.IDLE
 		self.attackState = c.NOTATTACKING
 		self.frameIndex = 0
 		self.switchIndex = 10
 		self.switchCounter = 0
-		self.meleeCounter = 0
-		self.meleeTime = 10
 		self.relX = 0
 		self.relY = 0
-		self.STR = 1
-		self.INT = 1
-		self.DEX = 1
+		self.info = info
+		self.LoadFrames()
+		self.SetUpAnimations()
+		self.SetUpForces()
+		self.SetUpMelee()
+		self.SetUpWeapon()
+		self.SetUpStats(self.info)
+
+	def SetUpForces(self):
+		self.velX = 0
+		self.velY = 0
+		self.maxVelX = c.MAX_VEL_X
+		self.maxVelY = c.MAX_VEL_Y
+		self.gravity = c.GRAVITY
+		self.accelX = c.ACCEL
+
+	def SetUpMelee(self):
+		self.allowAttack = True
+		self.meleeActive = False
+		self.meleeCounter = 0
+		self.meleeTime = 10
+
+	def SetUpStats(self, info):
+		self.HP = info["HP"]
+		self.LVL = info["LVL"]
+		self.STR = info["STR"]
+		self.INT = info["INT"]
+		self.DEX = info["DEX"]
+		self.XP = info["XP"]
+
+
+	def SetUpWeapon(self):
+		self.weaponImage = init.GRAPHICS['weapon']
+		self.weaponImage.set_colorkey((255, 0, 255))
+		self.weaponRect = self.weaponImage.get_rect()
+		self.weaponImage = pg.transform.scale(self.weaponImage,
+							  (int(self.weaponRect.width * c.ZOOM * 2), int(self.weaponRect.height * c.ZOOM * 2)))
+		self.weaponHbox = pg.Rect(0, 0, 24 * c.ZOOM, 2 * c.ZOOM)
 
 	def LoadFrames(self):
 		spriteSheetRect = self.spriteSheet.get_rect()
@@ -68,11 +84,25 @@ class Player(pg.sprite.Sprite):
 		self.anims['idle-left'] = [1]
 		self.anims['walk-right'] = cycle([3, 4])
 		self.anims['walk-left'] = cycle([6, 7])
+		self.image = self.frames[self.anims['idle-right'][0]]
+		self.rect = self.image.get_rect()
 
 	def Update(self, keys, events):
 		self.HandleState(keys, events)
 		self.Animation()
-	
+		self.UpdateInfo()
+
+	def UpdateInfo(self):
+		if self.HP < 0:
+			self.HP = 0
+		self.info["HP"] = self.HP
+		self.info["LVL"] = self.LVL
+		self.info["STR"] = self.STR
+		self.info["INT"] = self.INT
+		self.info["DEX"] = self.DEX
+		self.info["XP"] = self.XP
+
+
 	def HandleState(self, keys, events):
 		if self.state == c.IDLE:
 			self.Idle(keys,events)
@@ -167,7 +197,7 @@ class Player(pg.sprite.Sprite):
 		self.velY += self.gravity
 		self.velY += -0.2
 
-		if(self.velY > 0 and self.velY < self.maxVelY):
+		if(self.velY > 1 and self.velY < self.maxVelY):
 			self.state = c.WALKING
 			self.gravity = c.GRAVITY
 

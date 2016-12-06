@@ -12,7 +12,7 @@ from . import debug
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 
 # Initialize the pygame environment
-pg.mixer.pre_init(44100, -16, 1, 512)
+pg.mixer.pre_init(44100, -16, 1, 4096)
 pg.init()
 
 # Control which kind of events we see in the event queue
