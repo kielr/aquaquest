@@ -23,7 +23,7 @@ class Sound(object):
 
 	def MixerStartup(self):
 		""" Plays the correct BGM depending on the state of the game. """
-		if self.overhead.state == c.MAIN_MENU:
+		if self.overhead.state == c.MAIN_MENU and c.MUTE == False:
 			try:
 				pg.mixer.music.load(self.music_dict['title'])
 				pg.mixer.music.set_volume(0.5)
@@ -31,7 +31,7 @@ class Sound(object):
 				self.state = c.s_MENU
 			except(KeyError):
 				print("ERROR: title music not found!")
-		elif self.overhead.state == c.LEVEL1:
+		elif self.overhead.state == c.LEVEL1 and c.MUTE == False:
 			try:
 				pg.mixer.music.load(self.music_dict['level1'])
 				pg.mixer.music.set_volume(0.5)

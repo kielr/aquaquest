@@ -67,10 +67,16 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\states\continue_load.py" />
+    <Compile Include="data\level_transition_trigger.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="data\states\load_screen.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\states\main_menu.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="data\states\options_menu.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\states\__init__.py">

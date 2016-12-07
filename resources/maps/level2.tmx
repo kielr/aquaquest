@@ -114,4 +114,6 @@
  <objectgroup name="spawn">
   <object id="1" name="playerSpawn" type="spawn" x="720" y="96" width="16" height="16"/>
  </objectgroup>
+ <objectgroup name="checkpoints"/>
+ <objectgroup name="trigger"/>
 </map>

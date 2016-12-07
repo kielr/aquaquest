@@ -1,0 +1,13 @@
+__author__ = "kiel.regusters"
+
+import pygame as pg
+from . import constants as c
+from . import init
+
+class Trigger(pg.sprite.Sprite):
+	def __init__(self, x, y):
+		pg.sprite.Sprite.__init__(self)
+		self.relX = x
+		self.relY = y
+		self.image = pg.Surface((50,50))
+		self.rect = pg.Rect([x, y, 16 * c.ZOOM, 32 * c.ZOOM])

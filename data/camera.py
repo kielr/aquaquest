@@ -12,7 +12,6 @@ class Camera(object):
 		self.y = self.viewport.y
 		self.orgX = self.viewport.centerx
 		self.orgY = self.viewport.centery
-		self.limitRect = None
 	def __str__(self):
 		return "cameraX: {}, cameraY: {}, orgX: {}, orgY: {}".format(self.x, self.y, self.orgX, self.orgY)
 

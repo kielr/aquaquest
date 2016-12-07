@@ -10,7 +10,7 @@ from .. import constants as c
 from .. import debug
 from .. import init
 from .. import camera
-from .. import player, fireball, checkpoint
+from .. import player, fireball, checkpoint, level_transition_trigger
 
 newGameInfo = { "HP": 100, 
 				"LVL": 1,
@@ -34,6 +34,7 @@ class World(state.State):
 
 	def StartUp(self, currentTime):
 		# The player got here from PLAY, so it's the first level.
+		self.currentTime = currentTime
 		debug.debug("Getting TMX file...")
 		self.tiledMap = util_pygame.load_pygame("resources/maps/level1.tmx")
 		self.levelstate = "level1"
@@ -46,27 +47,46 @@ class World(state.State):
 		self.soundManager = soundmanager.Sound(self.overhead)
 		self.camera = camera.Camera()
 		self.state = c.UNPAUSE
-		self.camera.limitRect = self.levelRect
 		self.SpawnPlayer()
+		self.playerGroup = pg.sprite.Group(self.player)
 		self.SetUpSpriteGroups()
 		#Draw to Level surface
 		self.DrawLevel()
 
-	def Continue(self, currentTime, game_info, level):
+	def Transition(self, level):
+		debug.debug("Transition level to {}".format(level))
+		debug.debug("Getting TMX file...")
+		self.tiledMap = util_pygame.load_pygame("resources/maps/" + level + ".tmx")
+		self.levelstate = level
+		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM), 
+								  int(c.TILE_SIZE * self.tiledMap.height * c.ZOOM))).convert()
+		self.levelRect = self.levelSurface.get_rect()
+		self.overhead = utility.Overhead(c.LEVEL1)
+		self.overhead.info = self.player.info
+		self.soundManager = soundmanager.Sound(self.overhead)
+		self.TransitionPlayer(level)
+		self.SetUpSpriteGroups()
+		self.DrawLevel()
+
+	def Continue(self, currentTime, game_info):
 		"""
 		Method that is called whenever the user is continuing from checkpoint
 		"""
 		debug.debug("Getting TMX file...")
-		self.tiledMap = util_pygame.load_pygame("resources/maps/" + level + ".tmx")
+		self.tiledMap = util_pygame.load_pygame("resources/maps/" + game_info["level"] + ".tmx")
 		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM), 
 								  int(c.TILE_SIZE * self.tiledMap.height * c.ZOOM))).convert()
 		self.levelRect = self.levelSurface.get_rect()
 		debug.debug("Done")
 		debug.debug("Spawning Player")
-		self.levelstate = "level2"
-		newGameInfo = game_info
-		self.SpawnPlayer()
+		self.overhead = utility.Overhead(game_info['level'])
+		self.soundManager = soundmanager.Sound(self.overhead)
+		self.camera = camera.Camera()
+		self.state = c.UNPAUSE
+		self.levelstate = game_info["level"]
 		self.SetUpSpriteGroups()
+		self.SpawnPlayerContinue(self.checkpointDict[game_info['checkpoint']].x, self.checkpointDict[game_info['checkpoint']].y, game_info)
+		self.playerGroup = pg.sprite.Group(self.player)
 		#Draw to Level surface
 		self.DrawLevel()
 
@@ -74,18 +94,23 @@ class World(state.State):
 		"""
 		This method sets up all the sprite groups that will be used by the world.
 		"""
-		self.playerGroup = pg.sprite.Group(self.player)
 		self.fireballGroup = pg.sprite.Group()
 		self.checkpointGroup = pg.sprite.Group()
+		self.levelTriggerGroup = pg.sprite.Group()
 		i = 1
+
 		for checkpointObject in self.tiledMap.get_layer_by_name("checkpoints"):
 			newCheckpoint = checkpoint.Checkpoint(checkpointObject.x * c.ZOOM, checkpointObject.y * c.ZOOM)
 			self.checkpointGroup.add(newCheckpoint)
-			self.checkpointDict[i] = newCheckpoint
+			self.checkpointDict[i] = checkpointObject
 			self.playerCheckDict[newCheckpoint] = i
 			i += 1
-		self.SetUpSolidGroup()
 
+		for triggerObject in self.tiledMap.get_layer_by_name("trigger"):
+			newTrigger = level_transition_trigger.Trigger(triggerObject.x * c.ZOOM, triggerObject.y * c.ZOOM)
+			newTrigger.name = triggerObject.name
+			self.levelTriggerGroup.add(newTrigger)
+		self.SetUpSolidGroup()
 
 	def SetUpSolidGroup(self):
 		self.levelGroup = pg.sprite.Group()
@@ -100,6 +125,15 @@ class World(state.State):
 					newSprite.rect[3] *= c.ZOOM
 					self.levelGroup.add(newSprite)
 
+	def TransitionPlayer(self, level):
+		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
+		#self.playerX = playerSpawnObject.x
+		#self.playerY = playerSpawnObject.y
+		#self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
+		#self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
+		#self.player.relX = self.playerX * c.ZOOM
+		#self.player.relY = self.playerY * c.ZOOM
+
 	def SpawnPlayer(self):
 		# Find where player should spawn
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
@@ -111,6 +145,14 @@ class World(state.State):
 		self.player.relX = self.playerX * c.ZOOM
 		self.player.relY = self.playerY * c.ZOOM
 
+	def SpawnPlayerContinue(self, x, y, game_info):
+		self.playerX = x
+		self.playerY = y
+		self.player = player.Player(game_info)
+		self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
+		self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
+		self.player.relX = self.playerX * c.ZOOM
+		self.player.relY = self.playerY * c.ZOOM
 
 	def Update(self, surface, keys, currentTime, events):
 		# Handle States
@@ -157,11 +199,20 @@ class World(state.State):
 		self.CheckPlayerCheckpointCollisions()
 		self.MoveCheckpoint()
 
+		# Triggers
+		self.CheckTriggerCollision()
+		self.MoveTriggers()
+
 	def MoveCheckpoint(self):
 		for checkpoint in self.checkpointGroup.sprites():
 			checkpoint.Update()
 			checkpoint.rect.x = checkpoint.relX - self.camera.x
 			checkpoint.rect.y = checkpoint.relY - self.camera.y
+
+	def MoveTriggers(self):
+		for trigger in self.levelTriggerGroup.sprites():
+			trigger.rect.x = trigger.relX - self.camera.x
+			trigger.rect.y = trigger.relY - self.camera.y
 
 	def MoveFireball(self):
 		for fireball in self.fireballGroup.sprites():
@@ -179,6 +230,12 @@ class World(state.State):
 			fireball.rect.y = fireball.relY - self.camera.y
 			fireball.hurtbox[0] = fireball.rect.x
 			fireball.hurtbox[1] = fireball.rect.y
+
+	def CheckTriggerCollision(self):
+		trigger = pg.sprite.spritecollideany(self.player, self.levelTriggerGroup)
+
+		if trigger:
+			self.Transition(trigger.name)
 
 	def CheckPlayerCheckpointCollisions(self):
 		checkpointSprite = pg.sprite.spritecollideany(self.player, self.checkpointGroup)
@@ -315,6 +372,9 @@ class World(state.State):
 
 			for checkpoint in self.checkpointGroup.sprites():
 				pg.draw.rect(surface, (0,255,0), checkpoint.rect)
+
+			for trigger in self.levelTriggerGroup.sprites():
+				pg.draw.rect(surface, (0, 255, 255), trigger.rect)
 			
 			if self.player.attackState == c.ATTACKING:
 				if self.player.facingRight:

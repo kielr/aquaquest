@@ -1,9 +1,9 @@
-INT 1
-XP 0
-SP 0
-checkpoint 1
-STR 0
-LVL 1
-DEX 0
 HP 100
+STR 0
+DEX 0
 level level1
+SP 1
+checkpoint 1
+INT 0
+XP 0
+LVL 1

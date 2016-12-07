@@ -31,10 +31,12 @@ ACCEL = 0.5
 
 # Game States
 MAIN_MENU = "main menu"
+OPTIONS_MENU = "optionsmenu"
 LOAD_SCREEN = "load screen"
 MAP = "map"
 CONTINUE = "continue"
 LOADMAP = "loadmap"
+MUTE = False
 
 # Real Time States
 PAUSE = "pause"
@@ -47,11 +49,15 @@ s_MENU = "sound menu"
 
 # Level states
 LEVEL1 = "level1"
+LEVEL2 = "level2"
 
 # Cursor states
 PLAY = "play"
 LOAD = "load"
+OPTIONS = "options"
 QUIT = "quit"
+BACK = "back"
+MUSIC_MUTE = "mute"
 
 # Colors
 BLACK	=	(0, 0, 0)
