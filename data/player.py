@@ -59,6 +59,11 @@ class Player(pg.sprite.Sprite):
 		self.skillPointState = c.LEVEL_AVAILABLE
 		self.canLevelUp = True
 		self.canSpendSkills = True
+		self.canCast = True
+		self.isDead = False
+		self.damageInvuln = False
+		self.damageInvulnFrames = 90
+		self.damageInvulnTimer = 0
 
 	def CheckForLevelUp(self):
 		if self.XP >= 100 and self.canLevelUp == True:
@@ -75,6 +80,16 @@ class Player(pg.sprite.Sprite):
 			self.canSpendSkills = True
 		else:
 			self.canSpendSkills = False
+
+	def CheckForDeath(self):
+		if(self.HP <= 0):
+			self.isDead = True
+			self.allowAttack = False
+			self.allowJump = False
+			self.canCast = False
+			self.state = c.DEAD
+		elif(self.HP >= 100):
+			self.HP = 100
 
 	def SetUpWeapon(self):
 		self.weaponImage = init.GRAPHICS['weapon']
@@ -102,6 +117,8 @@ class Player(pg.sprite.Sprite):
 	def SetUpAnimations(self):
 		self.anims['idle-right'] = [0]
 		self.anims['idle-left'] = [1]
+		self.anims['death'] = [9]
+		self.anims['invisible'] = [10]
 		self.anims['walk-right'] = cycle([3, 4])
 		self.anims['walk-left'] = cycle([6, 7])
 		self.image = self.frames[self.anims['idle-right'][0]]
@@ -111,7 +128,10 @@ class Player(pg.sprite.Sprite):
 		self.HandleState(keys, events)
 		self.Animation()
 		self.CheckForLevelUp()
+		self.CheckForDeath()
 		self.UpdateInfo()
+		if self.damageInvuln:
+			self.Invulnerable()
 
 	def UpdateInfo(self):
 		if self.HP < 0:
@@ -124,6 +144,19 @@ class Player(pg.sprite.Sprite):
 		self.info["XP"] = self.XP
 		self.info["SP"] = self.SP
 
+	def TakeDamage(self, damage):
+		if self.damageInvuln == False:
+			init.SFX['hurt'].play()
+			self.damageInvuln = True
+			self.HP -= damage
+
+
+	def Invulnerable(self):
+		if self.damageInvulnTimer == self.damageInvulnFrames:
+			self.damageInvuln = False
+			self.damageInvulnTimer = False
+		else:
+			self.damageInvulnTimer += 1
 	def HandleState(self, keys, events):
 		if self.state == c.IDLE:
 			self.Idle(keys,events)
@@ -133,6 +166,8 @@ class Player(pg.sprite.Sprite):
 			self.Jumping(keys, events)
 		elif self.state == c.DOUBLEJUMP:
 			self.DoubleJump(keys, events)
+		elif self.state == c.DEAD:
+			self.Death()
 		if self.attackState == c.ATTACKING:
 			self.Attacking()
 		if self.canSpendSkills:
@@ -162,6 +197,11 @@ class Player(pg.sprite.Sprite):
 						self.SP -= 1
 					else:
 						init.SFX['fail'].play()
+
+	def Death(self):
+		self.velY += self.gravity
+		self.velX = 0
+		self.frameIndex = self.anims['death'][0]
 
 	def Idle(self, keys, events):
 		"""
@@ -309,4 +349,10 @@ class Player(pg.sprite.Sprite):
 
 
 	def Animation(self):
-		self.image = self.frames[self.frameIndex]
+		if self.damageInvuln == False or self.isDead:
+			self.image = self.frames[self.frameIndex]
+		else:
+			if self.damageInvulnTimer % 4 == 0:
+				self.image = self.frames[self.frameIndex]
+			else:
+				self.image = self.frames[self.anims["invisible"][0]]

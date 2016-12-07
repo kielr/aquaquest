@@ -39,6 +39,14 @@ class Sound(object):
 				self.state = c.NORMAL
 			except(KeyError):
 				print("ERROR: level music not found!")
+		elif self.overhead.state == c.LEVEL2 and c.MUTE == False:
+			try:
+				pg.mixer.music.load(self.music_dict['level2'])
+				pg.mixer.music.set_volume(0.5)
+				pg.mixer.music.play(loops=-1)
+				self.state = c.NORMAL
+			except(KeyError):
+				print("ERROR: level music not found!")
 	def StopBGM(self):
 		""" Simply stops all playback for music when called. """
 		pg.mixer.music.stop()

@@ -12,16 +12,6 @@ from .. import init
 from .. import camera
 from .. import player, fireball, checkpoint, level_transition_trigger
 
-newGameInfo = { "HP": 100, 
-				"LVL": 1,
-				"STR": 0,
-				"DEX": 0,
-				"INT": 0,
-				"XP": 0,
-			    "SP": 1,
-				"level": "level1", 
-				"checkpoint": None }
-
 class World(state.State):
 	""" 
 	This class holds the TMX map and handles collision between entities inside the map.
@@ -31,6 +21,9 @@ class World(state.State):
 		state.State.__init__(self)
 		self.checkpointDict = {}
 		self.playerCheckDict = {}
+		self.playerIsDead = False
+		self.waitCount = 0
+		self.waitTime = 120
 
 	def StartUp(self, currentTime):
 		# The player got here from PLAY, so it's the first level.
@@ -61,7 +54,7 @@ class World(state.State):
 		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM), 
 								  int(c.TILE_SIZE * self.tiledMap.height * c.ZOOM))).convert()
 		self.levelRect = self.levelSurface.get_rect()
-		self.overhead = utility.Overhead(c.LEVEL1)
+		self.overhead = utility.Overhead(level)
 		self.overhead.info = self.player.info
 		self.soundManager = soundmanager.Sound(self.overhead)
 		self.TransitionPlayer(level)
@@ -127,18 +120,28 @@ class World(state.State):
 
 	def TransitionPlayer(self, level):
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
-		#self.playerX = playerSpawnObject.x
-		#self.playerY = playerSpawnObject.y
-		#self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
-		#self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
-		#self.player.relX = self.playerX * c.ZOOM
-		#self.player.relY = self.playerY * c.ZOOM
+		self.playerX = playerSpawnObject.x
+		self.playerY = playerSpawnObject.y
+		self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
+		self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
+		self.player.relX = self.playerX * c.ZOOM
+		self.player.relY = self.playerY * c.ZOOM
+		self.player.info['level'] = "level2"
 
 	def SpawnPlayer(self):
 		# Find where player should spawn
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
 		self.playerX = playerSpawnObject.x
 		self.playerY = playerSpawnObject.y
+		newGameInfo = { "HP": 100, 
+				"LVL": 1,
+				"STR": 0,
+				"DEX": 0,
+				"INT": 0,
+				"XP": 0,
+			    "SP": 1,
+				"level": "level1", 
+				"checkpoint": None }
 		self.player = player.Player(newGameInfo)
 		self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
 		self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
@@ -171,18 +174,26 @@ class World(state.State):
 				self.done = True
 				self.quit = True
 			if event.type == pg.KEYDOWN:
-				if keys[pg.K_q]:
+				if keys[pg.K_ESCAPE]:
+					self.done = True
+					self.next = c.MAIN_MENU
+				if keys[pg.K_q] and self.player.canCast:
 					init.SFX['fireball'].play()
 					newFireball = fireball.Fireball(self.player.relX, self.player.relY, self.player.facingRight)
 					self.fireballGroup.add(newFireball)
+				if keys[pg.K_F2]:
+					self.player.TakeDamage(50)
+				if keys[pg.K_F3]:
+					self.player.HP += 50
 
-		if keys[pg.K_f]:
+		if keys[pg.K_F4]:
 			self.player.XP += 10
 		if self.state == c.UNPAUSE:
 			self.UpdateAllSprites(keys, events)
 
 	def UpdateAllSprites(self, keys, events):
 		# Player
+		self.CheckPlayerDeath()
 		self.player.Update(keys, events)
 		self.MovePlayerX()
 		self.CheckPlayerXLevelCollisions()
@@ -230,6 +241,20 @@ class World(state.State):
 			fireball.rect.y = fireball.relY - self.camera.y
 			fireball.hurtbox[0] = fireball.rect.x
 			fireball.hurtbox[1] = fireball.rect.y
+	
+	def CheckPlayerDeath(self):
+		if self.player.isDead and self.playerIsDead == False:
+			debug.debug("Player death.")
+			self.playerIsDead = True
+			init.SFX["death"].play()
+			self.soundManager.StopBGM()
+		elif self.playerIsDead:
+			if self.waitCount == self.waitTime:
+				self.waitCount = 0
+				self.playerIsDead = False
+				self.done = True
+				self.next = c.MAIN_MENU
+			self.waitCount += 1
 
 	def CheckTriggerCollision(self):
 		trigger = pg.sprite.spritecollideany(self.player, self.levelTriggerGroup)
@@ -241,7 +266,7 @@ class World(state.State):
 		checkpointSprite = pg.sprite.spritecollideany(self.player, self.checkpointGroup)
 
 		if checkpointSprite:
-			if checkpointSprite.got == False:
+			if checkpointSprite.got == False and self.player.isDead == False:
 				checkpointSprite.got = True
 				init.SFX['checkpointget'].play()
 				self.player.info['checkpoint'] = self.playerCheckDict[checkpointSprite]
