@@ -74,6 +74,17 @@ class Menu(state.State):
 						self.soundManager.sfx['cursor_move'].play()
 						self.cursor.rect.y = positions[0]
 						self.cursor.state = c.PLAY
+					for input in input_list:
+						if keys[input]:
+							try:
+								debug.debug("Stopping music")
+								self.soundManager.sfx['cursor_select'].play()
+								debug.debug("Continue selected.")
+								debug.debug("Set the next state to a load screen")
+								self.done = True
+								self.next = c.CONTINUE
+							except:
+								init.SFX['fail'].play()
 				else:
 					if keys[pg.K_s]:
 						self.soundManager.sfx['cursor_move'].play()

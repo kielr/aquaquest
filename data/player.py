@@ -1,3 +1,4 @@
+__author___ = "kiel.regusters"
 import pygame as pg
 from . import constants as c
 from . import init, gamemanager
@@ -54,7 +55,26 @@ class Player(pg.sprite.Sprite):
 		self.INT = info["INT"]
 		self.DEX = info["DEX"]
 		self.XP = info["XP"]
+		self.SP = info["SP"]
+		self.skillPointState = c.LEVEL_AVAILABLE
+		self.canLevelUp = True
+		self.canSpendSkills = True
 
+	def CheckForLevelUp(self):
+		if self.XP >= 100 and self.canLevelUp == True:
+			init.SFX['lvlup'].play()
+			self.LVL += 1
+			if self.LVL == c.LEVEL_CAP:
+				self.canLevelUp = False
+			self.SP += 1
+			if self.LVL != c.LEVEL_CAP:
+				self.XP = 0
+		elif self.canLevelUp == False:
+			self.XP = 100
+		if self.SP > 0:
+			self.canSpendSkills = True
+		else:
+			self.canSpendSkills = False
 
 	def SetUpWeapon(self):
 		self.weaponImage = init.GRAPHICS['weapon']
@@ -86,10 +106,11 @@ class Player(pg.sprite.Sprite):
 		self.anims['walk-left'] = cycle([6, 7])
 		self.image = self.frames[self.anims['idle-right'][0]]
 		self.rect = self.image.get_rect()
-
+		
 	def Update(self, keys, events):
 		self.HandleState(keys, events)
 		self.Animation()
+		self.CheckForLevelUp()
 		self.UpdateInfo()
 
 	def UpdateInfo(self):
@@ -101,7 +122,7 @@ class Player(pg.sprite.Sprite):
 		self.info["INT"] = self.INT
 		self.info["DEX"] = self.DEX
 		self.info["XP"] = self.XP
-
+		self.info["SP"] = self.SP
 
 	def HandleState(self, keys, events):
 		if self.state == c.IDLE:
@@ -114,6 +135,33 @@ class Player(pg.sprite.Sprite):
 			self.DoubleJump(keys, events)
 		if self.attackState == c.ATTACKING:
 			self.Attacking()
+		if self.canSpendSkills:
+			self.HandleSkillUp(keys, events)
+
+	def HandleSkillUp(self, keys, events):
+		for event in events:
+			if event.type == pg.KEYDOWN and self.canSpendSkills:
+				if keys[pg.K_1]:
+					if self.STR < 9:
+						init.SFX['skillup'].play()
+						self.STR += 1
+						self.SP -= 1
+					else:
+						init.SFX['fail'].play()
+				elif keys[pg.K_2]:
+					if self.DEX < 9:
+						init.SFX['skillup'].play()
+						self.DEX += 1
+						self.SP -= 1
+					else:
+						init.SFX['fail'].play()
+				elif keys[pg.K_3]:
+					if self.INT < 9:
+						init.SFX['skillup'].play()
+						self.INT += 1
+						self.SP -= 1
+					else:
+						init.SFX['fail'].play()
 
 	def Idle(self, keys, events):
 		"""

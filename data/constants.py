@@ -11,6 +11,8 @@ GRAVITY = 1
 JUMP_GRAVITY = 0.5
 JUMP_VEL = -7
 DOUBLE_JUMP_VEL = -7
+LEVEL_CAP = 20
+STAT_CAP = 9
 
 # Player states
 WALKING = "walking"
@@ -20,6 +22,9 @@ JUMP = "jump"
 DOUBLEJUMP = "djump"
 NOTATTACKING = "noattack"
 ATTACKING = "attack"
+LEVEL_AVAILABLE = "levelavailable"
+NO_SP = "nosp"
+
 
 # Player forces
 ACCEL = 0.5
@@ -28,6 +33,8 @@ ACCEL = 0.5
 MAIN_MENU = "main menu"
 LOAD_SCREEN = "load screen"
 MAP = "map"
+CONTINUE = "continue"
+LOADMAP = "loadmap"
 
 # Real Time States
 PAUSE = "pause"

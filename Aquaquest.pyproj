@@ -26,10 +26,16 @@
     <Compile Include="data\camera.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="data\checkpoint.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="data\constants.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\debug.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="data\fireball.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="data\gamemanager.py">
@@ -60,6 +66,7 @@
     <Compile Include="data\state.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="data\states\continue_load.py" />
     <Compile Include="data\states\load_screen.py">
       <SubType>Code</SubType>
     </Compile>

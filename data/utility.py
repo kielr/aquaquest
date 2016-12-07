@@ -15,6 +15,7 @@ class Overhead(object):
 	def __init__(self, state):
 		self.state = state
 		self.spriteSheet = init.GRAPHICS['font']
+		self.levelUpImage = init.GRAPHICS['levelupscreen']
 		self.CreateImageList()
 		self.CreateLifeLabel()
 		self.CreateLVLLabel()
@@ -69,6 +70,10 @@ class Overhead(object):
 				newSurface = pg.transform.scale(newSurface,
 							  (int(rect.width * 2), int(rect.height * 2)))
 				self.frames.append(newSurface)
+
+		self.blitLevelUp = pg.Surface((800, 600))
+		self.blitLevelUp.set_colorkey((128, 0, 128))
+		self.blitLevelUp.blit(self.levelUpImage, (0,0))
 
 	def CreateLifeLabel(self):
 		letters = [self.frames[43], self.frames[40], self.frames[37], self.frames[36]]
@@ -130,10 +135,18 @@ class Overhead(object):
 		"""
 		This method draws the game UI
 		"""
+		# Draw level screen
+		if self.info['SP'] != 0:
+			surface.blit(self.blitLevelUp, (0,0))
 		# Draw LVL
 		surface.blit(self.lvlLabel, (175,5))
 		# Draw LVL Total
-		surface.blit(self.orangeDict[self.info['LVL']], (202, 35))
+		if self.info['LVL'] < 10:
+			surface.blit(self.orangeDict[self.info['LVL']], (202, 35))
+		else:
+			surface.blit(self.orangeDict[self.info['LVL'] // 10], (202, 35))
+			surface.blit(self.orangeDict[self.info['LVL'] % 10], (234, 35))
+
 
 		# Draw STR
 		surface.blit(self.STRLabel, (286,5))

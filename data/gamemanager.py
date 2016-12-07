@@ -3,6 +3,7 @@ from . import debug as info
 from . import init
 from . import spritesheet
 from . import state
+from . states import world
 import pygame as pg
 import pytmx
 from util_pygame import load_pygame
@@ -63,7 +64,11 @@ class GameManager(object):
 		previous, self.stateName = self.stateName, self.state.next
 		# Clean up the state
 		self.state.Clean()
-		self.state = self.stateDict[self.stateName]
+		if self.stateName == "loadmap":
+			# If we get here then we need to load the character save.
+
+		else:
+			self.state = self.stateDict[self.stateName]
 		self.state.StartUp(self.currentTime)
 		self.previous = previous
 		
