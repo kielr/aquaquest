@@ -7,7 +7,7 @@ import os
 from itertools import chain, product
 from collections import defaultdict, namedtuple
 from xml.etree import ElementTree
-from six.moves import zip, map
+from . six.moves import zip, map
 from operator import attrgetter
 
 logger = logging.getLogger(__name__)
