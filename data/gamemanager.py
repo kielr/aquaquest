@@ -3,11 +3,11 @@ The module of the main game manager of the project. Contains the GameManager cla
 """
 
 __author__ = "kiel.regusters"
-from . import debug
-from . import init
-from . states import world
-from . import debug
-from . import constants as c
+import debug
+import init
+from states import world
+import debug
+import constants as c
 import pygame as pg
 
 class GameManager(object):

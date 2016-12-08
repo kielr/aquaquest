@@ -5,8 +5,8 @@ Module containing the trigger class. This class causes the level transition if t
 __author__ = "kiel.regusters"
 
 import pygame as pg
-from . import constants as c
-from . import init
+import constants as c
+import init
 
 class Trigger(pg.sprite.Sprite):
 	"""

@@ -4,12 +4,14 @@ Module that holds the Load Screen state class.
 
 __author__ = "kiel.regusters"
 
+import sys
+sys.path.append("..")
 import pygame as pg
-from .. import state
-from .. import constants as c
-from .. import utility
-from .. import init
-from .. import debug
+import state
+import constants as c
+import utility
+import init
+import debug
 
 class LoadScreen(state.State):
 	"""

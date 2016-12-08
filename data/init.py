@@ -5,8 +5,8 @@ Initializes display and will create dictionaries of all content that will be use
 """
 import os
 import pygame as pg
-from . import load
-from . import debug
+import load
+import debug
 
 # Control where the window for the game is created
 os.environ["SDL_VIDEO_CENTERED"] = "1"

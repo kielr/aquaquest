@@ -1,8 +1,8 @@
 __author__ = "kiel.regusters"
 """ This module contains the Overhead class, and a class for writing text."""
 import pygame as pg
-from . import init
-from . import constants as c
+import init
+import constants as c
 
 class Character(pg.sprite.Sprite):
 	def __init__(self, image):

@@ -4,13 +4,15 @@ This module contains the Menu state class for the game.
 
 __author__ = "kiel.regusters"
 
+import sys
+sys.path.append("..")
 import pygame as pg
-from .. import constants as c
-from .. import state
-from .. import init
-from .. import utility
-from .. import soundmanager
-from .. import debug
+import constants as c
+import state
+import init
+import utility
+import soundmanager
+import debug
 
 class Menu(state.State):
 	"""

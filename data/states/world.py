@@ -3,19 +3,21 @@ This module contains the World state class and is where most of the game will be
 """
 
 __author__ = "kiel.regusters"
+
+import sys
+sys.path.append("..")
 import pygame as pg
-import os
-from .. import state
-from .. libs import pytmx
-from .. libs import util_pygame
-from .. import soundmanager
-from .. import utility
-from .. import constants as c
-from .. import debug
-from .. import init
-from .. import camera
-from .. import player, fireball, checkpoint, level_transition_trigger
-from .. import enemy
+import state
+from libs import pytmx
+from libs import util_pygame
+import soundmanager
+import utility
+import constants as c
+import debug
+import init
+import camera
+import player, fireball, checkpoint, level_transition_trigger
+import enemy
 
 class World(state.State):
 	""" 

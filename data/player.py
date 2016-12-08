@@ -4,8 +4,8 @@ Module that contains the Player class. Another big part of the game.
 
 __author___ = "kiel.regusters"
 import pygame as pg
-from . import constants as c
-from . import init, gamemanager
+import constants as c
+import init, gamemanager
 from itertools import cycle
 
 keybinding = {

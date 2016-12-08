@@ -4,13 +4,15 @@ This Module contains the Options state class.
 
 __author__ = "kiel.regusters"
 
+import sys
+sys.path.append("..")
 import pygame as pg
-from .. import constants as c
-from .. import state
-from .. import init
-from .. import utility
-from .. import soundmanager
-from .. import debug
+import constants as c
+import state
+import init
+import utility
+import soundmanager
+import debug
 
 class Options(state.State):
 	"""
