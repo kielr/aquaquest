@@ -6,4 +6,6 @@ setup(name="Aquaquest!", # The package/module name
 	  author_email="regustersk@gmail.com",
 	  py_modules=["aquaquest_play"],
 	  packages=["data", "data.libs", "data.states"],
+          package_data={"data":["resources/graphics/*", "resources/music/*", "resources/maps/*",
+            "resources/tilesets/*", "resources/sfx/*"]},
 	  )

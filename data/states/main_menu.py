@@ -7,12 +7,12 @@ __author__ = "kiel.regusters"
 import sys
 sys.path.append("..")
 import pygame as pg
-import constants as c
-import state
-import init
-import utility
-import soundmanager
-import debug
+from .. import constants as c
+from .. import state
+from .. import init
+from .. import utility
+from .. import soundmanager
+from .. import debug
 
 class Menu(state.State):
 	"""

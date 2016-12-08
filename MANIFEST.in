@@ -1,5 +1,6 @@
-include resources/graphics/*
-include resources/music/*
-include resources/maps/*
-include resources/tilesets/*
-include resources/sfx/*
+include data/resources/graphics/*
+include data/resources/music/*
+include data/resources/maps/*
+include data/resources/tilesets/*
+include data/resources/sfx/*
+include README_USERGUIDE.txt

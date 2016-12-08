@@ -7,12 +7,12 @@ __author__ = "kiel.regusters"
 import sys
 sys.path.append("..")
 import pygame as pg
-import state
-import constants as c
-import utility
-import init
-import debug
-import soundmanager
+from .. import state
+from .. import constants as c
+from .. import utility
+from .. import init
+from .. import debug
+from .. import soundmanager
 
 class GameOver(state.State):
 	"""
@@ -23,7 +23,7 @@ class GameOver(state.State):
 	"""
 	def __init__(self):
 		state.State.__init__(self)
-	
+
 	def StartUp(self, currentTime):
 		"""
 		The initial function called on every state. Sets up overhead info, soundmanager, and graphics if necessary

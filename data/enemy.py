@@ -4,8 +4,8 @@ This module contains the information needed to create working enemies.
 
 __author___ = "kiel.regusters"
 import pygame as pg
-import constants as c
-import init, gamemanager
+from . import constants as c
+from . import init, gamemanager
 from itertools import cycle
 
 class Enemy(pg.sprite.Sprite):

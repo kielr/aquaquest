@@ -1,8 +1,8 @@
 __author__ = "kiel.regusters"
 """ This module contains the Overhead class, and a class for writing text."""
 import pygame as pg
-import init
-import constants as c
+from . import init
+from . import constants as c
 
 class Character(pg.sprite.Sprite):
 	def __init__(self, image):
@@ -102,7 +102,7 @@ class Overhead(object):
 		for letter in letters:
 			self.lifeLabel.blit(letter, (i, 0))
 			i += 16 * 2
-	
+
 	def CreateLVLLabel(self):
 		"""
 		Create the LVL text that will be shown on the UI.

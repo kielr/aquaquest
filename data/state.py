@@ -9,7 +9,7 @@ class State(object):
 		self.quit = False
 		self.next = None
 		self.previous = None
-	
+
 	def Clean(self):
 		""" Simple method that will clean up a used up state so that it's usable again later. """
 		self.done = False

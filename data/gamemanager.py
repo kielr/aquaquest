@@ -3,12 +3,16 @@ The module of the main game manager of the project. Contains the GameManager cla
 """
 
 __author__ = "kiel.regusters"
-import debug
-import init
-from states import world
-import debug
-import constants as c
+from . import debug
+from . import init
+from . states import world
+from . import debug
+from . import constants as c
+import os
 import pygame as pg
+
+path = os.path.abspath(__file__)
+dir_path = os.path.dirname(path)
 
 class GameManager(object):
 	""" This class is the main control class for the entire project. It handles the main game loop,
@@ -44,7 +48,7 @@ class GameManager(object):
 			if not self.showFPS:
 				pg.display.set_caption("Aquaquest! ")
 
-	
+
 	def SetupStates(self, stateDict, startState):
 		"""
 		Sets up the state dictionary for the game.
@@ -65,7 +69,7 @@ class GameManager(object):
 
 	def FlipState(self):
 		""" When a state finishes, this method is called to transition the game to the next state, whatever it may be."""
-		# Keep the current state and the next state in memory 
+		# Keep the current state and the next state in memory
 		previous, self.stateName = self.stateName, self.state.next
 		# Clean up the state
 		self.state.Clean()
@@ -93,7 +97,7 @@ class GameManager(object):
 			self.state = self.stateDict[self.stateName]
 			self.state.StartUp(self.currentTime)
 		self.previous = previous
-		
+
 
 	# Blit the title
 	def main(self):

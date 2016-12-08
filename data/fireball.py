@@ -4,8 +4,8 @@ Module that contains the fireball used by the player.
 
 __author__ = "kiel.regusters"
 import pygame as pg
-import constants as c
-import init, gamemanager
+from . import constants as c
+from . import init, gamemanager
 
 class Fireball(pg.sprite.Sprite):
 	def __init__(self, relX, relY, facingRight):

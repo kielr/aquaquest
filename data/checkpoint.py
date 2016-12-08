@@ -5,8 +5,8 @@ This module contains the Checkpoint trigger class to be used with pytmx.
 """
 
 import pygame as pg
-import constants as c
-import init
+from . import constants as c
+from . import init
 
 class Checkpoint(pg.sprite.Sprite):
 	"""

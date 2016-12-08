@@ -4,12 +4,16 @@ This module contains utility functions for loading content into the game.
 """
 import pygame as pg
 import os
-
-
+import sys
+sys.path.append(os.path.join("resources", "graphics"))
+sys.path.append(os.path.join("resources", "music"))
+sys.path.append(os.path.join("resources", "sfx"))
+sys.path.append(os.path.join("resources", "tilesets"))
+sys.path.append(os.path.join("resources", "maps"))
 
 def load_all_gfx(directory, accept=(".png", ".jpg", ".bmp")):
 	gfx = {}
-	
+
 	for tileset in os.listdir(directory):
 		name, ext = os.path.splitext(tileset)
 		if ext.lower() in accept:

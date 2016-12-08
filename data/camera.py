@@ -3,7 +3,7 @@ __author__ = "kiel.regusters"
 """
 Module for a camera object that lets us change what the viewport sees.
 """
-import init
+from . import init
 import pygame as pg
 class Camera(object):
 	"""

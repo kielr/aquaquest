@@ -7,12 +7,12 @@ __author__ = "kiel.regusters"
 import sys
 sys.path.append("..")
 import pygame as pg
-import constants as c
-import state
-import init
-import utility
-import soundmanager
-import debug
+from .. import constants as c
+from .. import state
+from .. import init
+from .. import utility
+from .. import soundmanager
+from .. import debug
 
 class Options(state.State):
 	"""
@@ -26,8 +26,8 @@ class Options(state.State):
 		self.StartUp(0.0)
 
 	def StartUp(self, currentTime):
-		""" 
-		Called everytime we switch to this state 
+		"""
+		Called everytime we switch to this state
 		"""
 		self.overhead = utility.Overhead(c.MAIN_MENU)
 		self.soundManager = soundmanager.Sound(self.overhead)

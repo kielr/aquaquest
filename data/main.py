@@ -1,8 +1,8 @@
 __author__ = "kiel.regusters"
-import init
-import gamemanager
-from states import main_menu, load_screen, world, continue_load, options_menu, gameover
-import constants as c
+from . import init
+from . import gamemanager
+from . states import main_menu, load_screen, world, continue_load, options_menu, gameover
+from . import constants as c
 
 def main():
 	""" Sets up screen states. """
@@ -17,4 +17,4 @@ def main():
 	game.SetupStates(stateDict, c.MAIN_MENU)
 	game.main()
 
-	
+

@@ -6,9 +6,11 @@ Initializes display and will create dictionaries of all content that will be use
 import os
 import sys
 import pygame as pg
-import load
-import debug
-
+from . import load
+from . import debug
+path = os.path.abspath(__file__)
+dir_path = os.path.dirname(path)
+print(dir_path)
 # Control where the window for the game is created
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 
@@ -29,13 +31,13 @@ SCREEN_RECTANGLE = SCREEN.get_rect()
 # Load content
 
 # Music
-BGM = load.load_all_music(os.path.join("resources","music"))
+BGM = load.load_all_music(os.path.join(dir_path, "resources","music"))
 
 # SFX
-SFX = load.load_all_sfx(os.path.join("resources", "sfx"))
+SFX = load.load_all_sfx(os.path.join(dir_path, "resources", "sfx"))
 
 # Map Tilesets
-TILESETS = load.load_all_gfx(os.path.join("resources", "tilesets"))
-GRAPHICS = load.load_all_gfx(os.path.join("resources", "graphics"))
+TILESETS = load.load_all_gfx(os.path.join(dir_path, "resources", "tilesets"))
+GRAPHICS = load.load_all_gfx(os.path.join(dir_path, "resources", "graphics"))
 
 debug.debug("DONE: Loaded all content.")

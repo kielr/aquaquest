@@ -5,9 +5,9 @@ Module that handles sound and bgm based off of the state of the game.
 """
 
 import pygame as pg
-import init
-import constants as c
-import utility
+from . import init
+from . import constants as c
+from . import utility
 
 class Sound(object):
 	"""

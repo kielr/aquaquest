@@ -5,22 +5,26 @@ This module contains the World state class and is where most of the game will be
 __author__ = "kiel.regusters"
 
 import sys
-sys.path.append("..")
+import os
 import pygame as pg
-import state
-from libs import pytmx
-from libs import util_pygame
-import soundmanager
-import utility
-import constants as c
-import debug
-import init
-import camera
-import player, fireball, checkpoint, level_transition_trigger
-import enemy
+from .. import state
+from .. libs import pytmx
+from .. libs import util_pygame
+from .. import soundmanager
+from .. import utility
+from .. import constants as c
+from .. import debug
+from .. import init
+from .. import camera
+from .. import player, fireball, checkpoint, level_transition_trigger
+from .. import enemy
+
+path = os.path.abspath(__file__)
+dir_path = os.path.dirname(path)
+par_dir = os.path.abspath(os.path.join(dir_path, os.pardir))
 
 class World(state.State):
-	""" 
+	"""
 	This class holds the TMX map and handles collision between entities inside the map.
 	It will also probably handle things like checkpoint and file IO for saving. It also
 	has conversation with the player sprite class and all other entities inside of it.
@@ -43,9 +47,9 @@ class World(state.State):
 		# The player got here from PLAY, so it's the first level.
 		self.currentTime = currentTime
 		debug.debug("Getting TMX file...")
-		self.tiledMap = util_pygame.load_pygame("resources/maps/level1.tmx")
+		self.tiledMap = util_pygame.load_pygame(os.path.join(par_dir, "resources/maps/level1.tmx"))
 		self.levelstate = "level1"
-		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM), 
+		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM),
 								  int(c.TILE_SIZE * self.tiledMap.height * c.ZOOM))).convert()
 		self.levelRect = self.levelSurface.get_rect()
 		debug.debug("Done")
@@ -67,9 +71,9 @@ class World(state.State):
 		"""
 		debug.debug("Transition level to {}".format(level))
 		debug.debug("Getting TMX file...")
-		self.tiledMap = util_pygame.load_pygame("resources/maps/" + level + ".tmx")
+		self.tiledMap = util_pygame.load_pygame(os.path.join(par_dir, "resources/maps/" + level + ".tmx"))
 		self.levelstate = level
-		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM), 
+		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM),
 								  int(c.TILE_SIZE * self.tiledMap.height * c.ZOOM))).convert()
 		self.levelRect = self.levelSurface.get_rect()
 		self.overhead = utility.Overhead(level)
@@ -85,8 +89,8 @@ class World(state.State):
 		stats to give him.
 		"""
 		debug.debug("Getting TMX file...")
-		self.tiledMap = util_pygame.load_pygame("resources/maps/" + game_info["level"] + ".tmx")
-		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM), 
+		self.tiledMap = util_pygame.load_pygame(os.path.join(par_dir, "resources/maps/" + game_info["level"] + ".tmx"))
+		self.levelSurface = pg.Surface((int(c.TILE_SIZE * self.tiledMap.width * c.ZOOM),
 								  int(c.TILE_SIZE * self.tiledMap.height * c.ZOOM))).convert()
 		self.levelRect = self.levelSurface.get_rect()
 		debug.debug("Done")
@@ -177,14 +181,14 @@ class World(state.State):
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
 		self.playerX = playerSpawnObject.x
 		self.playerY = playerSpawnObject.y
-		newGameInfo = { "HP": 100, 
+		newGameInfo = { "HP": 100,
 				"LVL": 1,
 				"STR": 0,
 				"DEX": 0,
 				"INT": 0,
 				"XP": 0,
 			    "SP": 1,
-				"level": "level1", 
+				"level": "level1",
 				"checkpoint": None }
 		self.player = player.Player(newGameInfo)
 		self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
@@ -263,7 +267,7 @@ class World(state.State):
 		self.CheckEnemyPlayerCollision()
 
 		self.overhead.Update(self.player.info)
-		
+
 		# Update Enemies
 		for enemies in self.enemyGroup.sprites():
 			enemies.Update()
@@ -357,7 +361,7 @@ class World(state.State):
 			fireball.rect.y = fireball.relY - self.camera.y
 			fireball.hurtbox[0] = fireball.rect.x
 			fireball.hurtbox[1] = fireball.rect.y
-	
+
 	def CheckPlayerDeath(self):
 		"""
 		Listen for the player object telling us that the player is dead. If the player is dead
@@ -458,7 +462,7 @@ class World(state.State):
 				enemies.CheckForDeath()
 				if enemies.isDead:
 					self.player.XP += 25
-	
+
 	def CheckEnemyPlayerCollision(self):
 		"""
 		Check to see if the enemy collided with the player, if they did, deal damage to the player.
@@ -529,7 +533,7 @@ class World(state.State):
 			self.player.weaponHbox.x = self.player.rect.x + 50
 		else:
 			self.player.weaponHbox.x = self.player.rect.x - 71
-	
+
 	def MovePlayerY(self):
 		"""
 	    Move the player on the y-axis.
@@ -537,7 +541,7 @@ class World(state.State):
 		self.player.relY += self.player.velY
 		self.player.rect.y = self.player.relY - self.camera.y
 		self.player.weaponHbox.y = self.player.rect.y + 22
-	
+
 	def UpdateCameraX(self):
 		"""
 		Move the camera on the x-axis
@@ -568,8 +572,8 @@ class World(state.State):
 			if "Object" not in str(type(layer)):
 				for x,y,image in layer.tiles():
 					rect = image.get_rect()
-					self.levelSurface.blit(pg.transform.scale(image, (int(rect.width*3), 
-												(int(rect.width*3)))), 
+					self.levelSurface.blit(pg.transform.scale(image, (int(rect.width*3),
+												(int(rect.width*3)))),
 												[c.TILE_SIZE * c.ZOOM * x, c.TILE_SIZE * c.ZOOM * y])
 
 	def DrawEverything(self, surface):
@@ -590,19 +594,19 @@ class World(state.State):
 
 		# Draw fireball
 		self.fireballGroup.draw(surface)
-		
+
 		# Draw Checkpoints
 		self.checkpointGroup.draw(surface)
-		
+
 		# Draw weapon if active
 		if self.player.meleeActive:
 			if self.player.facingRight:
 				surface.blit(self.player.weaponImage, [self.player.rect.x + 45, self.player.rect.y - 25, self.player.rect.w, self.player.rect.h])
 			else:
-				surface.blit(pg.transform.flip(self.player.weaponImage, True, False), 
+				surface.blit(pg.transform.flip(self.player.weaponImage, True, False),
 				 [self.player.rect.x - 95, self.player.rect.y - 25, self.player.rect.w, self.player.rect.h])
 
-		
+
 
 
 		# Draw overhead info
@@ -623,7 +627,7 @@ class World(state.State):
 
 			for enemy in self.enemyGroup.sprites():
 				pg.draw.rect(surface, (200, 20, 20), enemy.rect)
-			
+
 			if self.player.attackState == c.ATTACKING:
 				if self.player.facingRight:
 					pg.draw.rect(surface, (255,0,0), self.player.weaponHbox)

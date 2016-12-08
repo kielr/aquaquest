@@ -1,6 +1,6 @@
 import logging
 import itertools
-import pytmx
+from . import pytmx
 
 logger = logging.getLogger(__name__)
 ch = logging.StreamHandler()

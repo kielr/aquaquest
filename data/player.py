@@ -4,8 +4,8 @@ Module that contains the Player class. Another big part of the game.
 
 __author___ = "kiel.regusters"
 import pygame as pg
-import constants as c
-import init, gamemanager
+from . import constants as c
+from . import init, gamemanager
 from itertools import cycle
 
 keybinding = {
@@ -154,7 +154,7 @@ class Player(pg.sprite.Sprite):
 		self.anims['walk-left'] = cycle([6, 7])
 		self.image = self.frames[self.anims['idle-right'][0]]
 		self.rect = self.image.get_rect()
-		
+
 	def Update(self, keys, events):
 		"""
 		Main update loop, we need to handle the current state, input, animation, checking for events, and updating our persistant info.
@@ -358,9 +358,9 @@ class Player(pg.sprite.Sprite):
 				self.velX = self.maxVelX * -1 - self.DEX / 2
 		if keys[keybinding['right']] and self.state == c.JUMP:
 			if self.velX < self.maxVelX + self.DEX / 2 :
-				self.velX += self.accelX + self.DEX / 2 
+				self.velX += self.accelX + self.DEX / 2
 			elif self.velX > self.maxVelX + self.DEX / 2 :
-				self.velX = self.maxVelX + self.DEX / 2  
+				self.velX = self.maxVelX + self.DEX / 2
 
 		for event in events:
 			if event.type == pg.KEYDOWN:
@@ -372,7 +372,7 @@ class Player(pg.sprite.Sprite):
 				if keys[keybinding['melee']]:
 					self.attackState = c.ATTACKING
 					init.SFX['attack'].play()
-	
+
 	def DoubleJump(self, keys, events):
 		"""
 		Same as jump, but you can't jump out a doublejump.
@@ -391,7 +391,7 @@ class Player(pg.sprite.Sprite):
 				self.velX = self.maxVelX * -1 - self.DEX / 2
 		if keys[keybinding['right']] and self.state == c.DOUBLEJUMP:
 			if self.velX < self.maxVelX + self.DEX / 2 :
-				self.velX += self.accelX + self.DEX / 2 
+				self.velX += self.accelX + self.DEX / 2
 			elif self.velX > self.maxVelX + self.DEX / 2 :
 				self.velX = self.maxVelX + self.DEX / 2
 
