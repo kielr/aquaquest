@@ -18,6 +18,9 @@ class Continue(state.State):
 	This class handles the loading screen animation. It doesn't actually do the loading, it is only for show.
 	Slightly different from the loading state in that self.next is set to c.LOADMAP to let the gamemanager know to load
 	a save file instead of a new game.
+
+	>>> Continue()
+	<__main__.Continue object at ...>
 	"""
 	def __init__(self):
 		state.State.__init__(self)

@@ -17,6 +17,9 @@ import debug
 class Options(state.State):
 	"""
 	This is the class for the main menu state. This is where the user will choose what to change in options.
+
+	>>> Options()
+	<__main__.Options object at ...>
 	"""
 	def __init__(self):
 		state.State.__init__(self)

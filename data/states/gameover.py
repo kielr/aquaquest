@@ -17,6 +17,9 @@ import soundmanager
 class GameOver(state.State):
 	"""
 	This class handles the gameover screen state of the game
+
+	>>> GameOver()
+	<__main__.GameOver object at ...>
 	"""
 	def __init__(self):
 		state.State.__init__(self)

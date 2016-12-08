@@ -71,24 +71,24 @@ class GameManager(object):
 		self.state.Clean()
 		if self.stateName == "loadmap":
 			# If we get here then we need to load the character save.
-			#try:
-			f = open("save", "r")
-			content = f.readlines()
-			game_info = {}
-			for data in content:
-				e = data.split()
-				try:
-					game_info[e[0]] = int(e[1])
-				except:
-					game_info[e[0]] = e[1]
-			f.close()
-			loadedWorld = world.World()
-			self.state = loadedWorld
-			self.state.Continue(self.currentTime, game_info)
+			try:
+				f = open("save", "r")
+				content = f.readlines()
+				game_info = {}
+				for data in content:
+					e = data.split()
+					try:
+						game_info[e[0]] = int(e[1])
+					except:
+						game_info[e[0]] = e[1]
+				f.close()
+				loadedWorld = world.World()
+				self.state = loadedWorld
+				self.state.Continue(self.currentTime, game_info)
 
-			#except:
-			#	debug.debug("Error loading save, perhaps there isn't one?")
-			#	self.state = self.stateDict[c.MAIN_MENU]
+			except:
+				debug.debug("Error loading save, perhaps there isn't one?")
+				self.state = self.stateDict[c.MAIN_MENU]
 		else:
 			self.state = self.stateDict[self.stateName]
 			self.state.StartUp(self.currentTime)

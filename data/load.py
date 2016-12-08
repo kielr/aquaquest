@@ -9,6 +9,7 @@ import os
 
 def load_all_gfx(directory, accept=(".png", ".jpg", ".bmp")):
 	gfx = {}
+	
 	for tileset in os.listdir(directory):
 		name, ext = os.path.splitext(tileset)
 		if ext.lower() in accept:

@@ -17,6 +17,9 @@ import debug
 class Menu(state.State):
 	"""
 	This is the class for the main menu state. This is where the user will choose what the program do.
+
+	>>> Menu()
+	<__main__.Menu object at ...>
 	"""
 	def __init__(self):
 		state.State.__init__(self)

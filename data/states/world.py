@@ -24,6 +24,9 @@ class World(state.State):
 	This class holds the TMX map and handles collision between entities inside the map.
 	It will also probably handle things like checkpoint and file IO for saving. It also
 	has conversation with the player sprite class and all other entities inside of it.
+
+	>>> World()
+	<__main__.World object at ...>
 	"""
 	def __init__(self):
 		state.State.__init__(self)

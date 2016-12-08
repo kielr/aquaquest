@@ -16,6 +16,9 @@ import debug
 class LoadScreen(state.State):
 	"""
 	This class handles the loading screen animation. It doesn't actually do the loading, it is only for show.
+
+	>>> LoadScreen()
+	<__main__.LoadScreen object at ...>
 	"""
 	def __init__(self):
 		state.State.__init__(self)

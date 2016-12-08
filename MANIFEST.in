@@ -1,0 +1,5 @@
+include resources/graphics/*
+include resources/music/*
+include resources/maps/*
+include resources/tilesets/*
+include resources/sfx/*

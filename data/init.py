@@ -4,6 +4,7 @@ __author__ = "kiel.regusters"
 Initializes display and will create dictionaries of all content that will be used
 """
 import os
+import sys
 import pygame as pg
 import load
 import debug
