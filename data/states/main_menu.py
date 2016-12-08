@@ -1,3 +1,9 @@
+"""
+This module contains the Menu state class for the game.
+"""
+
+__author__ = "kiel.regusters"
+
 import pygame as pg
 from .. import constants as c
 from .. import state
@@ -7,18 +13,26 @@ from .. import soundmanager
 from .. import debug
 
 class Menu(state.State):
+	"""
+	This is the class for the main menu state. This is where the user will choose what the program do.
+	"""
 	def __init__(self):
 		state.State.__init__(self)
 		self.StartUp(0.0)
 
 	def StartUp(self, currentTime):
-		""" Called everytime we switch to this state """
+		"""
+		The initial function called on every state. Sets up overhead info, soundmanager, and graphics if necessary
+		"""
 		self.overhead = utility.Overhead(c.MAIN_MENU)
 		self.soundManager = soundmanager.Sound(self.overhead)
 		self.titlescreen = init.GRAPHICS['title']
 		self.SetupCursor()
 
 	def SetupCursor(self):
+		"""
+		Sets up the cursor sprite and initializees its state for later.
+		"""
 		self.cursor = pg.sprite.Sprite()
 		dest = (220, 275)
 
@@ -27,6 +41,9 @@ class Menu(state.State):
 		self.cursor.state = c.PLAY
 
 	def GetImage(self, x, y, width, height, dest, spritesheet):
+		"""
+		Gets the image of the cursor and scales it up.
+		"""
 		image = pg.Surface([width, height])
 		rect = image.get_rect()
 
@@ -40,6 +57,9 @@ class Menu(state.State):
 		return (image, rect)
 	#
 	def UpdateCursor(self, keys, events):
+		"""
+		Called every frame and listens for user input to move the cursor around.
+		"""
 		positions = [275, 325, 435, 375]
 		input_list = [pg.K_SPACE, pg.K_RETURN, pg.K_e, pg.K_f]
 		for event in events:

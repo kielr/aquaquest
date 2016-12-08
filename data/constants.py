@@ -1,3 +1,7 @@
+"""
+This module contains constants used by the game.
+"""
+
 __author__ = "kiel.regusters"
 
 # Game Info

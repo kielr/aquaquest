@@ -1,10 +1,17 @@
 __author__ = "kiel.regusters"
 
+"""
+This module contains the Checkpoint trigger class to be used with pytmx.
+"""
+
 import pygame as pg
 from . import constants as c
 from . import init
 
 class Checkpoint(pg.sprite.Sprite):
+	"""
+	This class contains two frames. A frame for when the character hasn't collided, and a frame for when they have.
+	"""
 	def __init__(self, x, y):
 		pg.sprite.Sprite.__init__(self)
 		self.spritenormal = init.GRAPHICS['checkpoint'].convert_alpha()
@@ -15,6 +22,9 @@ class Checkpoint(pg.sprite.Sprite):
 		self.got = False
 
 	def SetUpImages(self):
+		"""
+		Sets up both of the frames used for both states of the checkpoint.
+		"""
 		blitCheck = pg.Surface((16, 16))
 		blitCheck.set_colorkey((255, 0, 255))
 		blitCheck.blit(self.spritenormal, (0,0))
@@ -33,6 +43,9 @@ class Checkpoint(pg.sprite.Sprite):
 		self.rect.y = 0
 
 	def Update(self):
+		"""
+		Listens for the got flag to be true otherwise, do nothing.
+		"""
 		if self.got == True:
 			self.image = self.frame2
 		else:

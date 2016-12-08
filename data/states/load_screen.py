@@ -1,8 +1,8 @@
-__author__ = "kiel.regusters"
+"""
+Module that holds the Load Screen state class.
+"""
 
-"""
-Module that holds the LoadScreen state class.
-"""
+__author__ = "kiel.regusters"
 
 import pygame as pg
 from .. import state
@@ -19,6 +19,9 @@ class LoadScreen(state.State):
 		state.State.__init__(self)
 	
 	def StartUp(self, currentTime):
+		"""
+		The initial function called on every state. Sets up overhead info, soundmanager, and graphics if necessary
+		"""
 		self.startTime = currentTime
 		self.next = c.MAP
 		self.overhead = utility.Overhead(c.LOAD_SCREEN)

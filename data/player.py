@@ -1,3 +1,7 @@
+"""
+Module that contains the Player class. Another big part of the game.
+"""
+
 __author___ = "kiel.regusters"
 import pygame as pg
 from . import constants as c
@@ -12,6 +16,9 @@ keybinding = {
 }
 
 class Player(pg.sprite.Sprite):
+	"""
+	The main Player class that the user takes control of.
+	"""
 	def __init__(self, info):
 		pg.sprite.Sprite.__init__(self)
 		self.spriteSheet = init.GRAPHICS['character']
@@ -35,6 +42,9 @@ class Player(pg.sprite.Sprite):
 		self.SetUpStats(self.info)
 
 	def SetUpForces(self):
+		"""
+		Set up the various forces needed to move the player.
+		"""
 		self.velX = 0
 		self.velY = 0
 		self.maxVelX = c.MAX_VEL_X
@@ -43,12 +53,18 @@ class Player(pg.sprite.Sprite):
 		self.accelX = c.ACCEL
 
 	def SetUpMelee(self):
+		"""
+		Set up the melee states and active frames.
+		"""
 		self.allowAttack = True
 		self.meleeActive = False
 		self.meleeCounter = 0
 		self.meleeTime = 10
 
 	def SetUpStats(self, info):
+		"""
+		Set up the stats that the world and enemies see
+		"""
 		self.HP = info["HP"]
 		self.LVL = info["LVL"]
 		self.STR = info["STR"]
@@ -66,6 +82,9 @@ class Player(pg.sprite.Sprite):
 		self.damageInvulnTimer = 0
 
 	def CheckForLevelUp(self):
+		"""
+		Check for the player leveling up and change states around.
+		"""
 		if self.XP >= 100 and self.canLevelUp == True:
 			init.SFX['lvlup'].play()
 			self.LVL += 1
@@ -82,6 +101,9 @@ class Player(pg.sprite.Sprite):
 			self.canSpendSkills = False
 
 	def CheckForDeath(self):
+		"""
+		Check to see if we need to let the world know that we died.
+		"""
 		if(self.HP <= 0):
 			self.isDead = True
 			self.allowAttack = False
@@ -92,6 +114,9 @@ class Player(pg.sprite.Sprite):
 			self.HP = 100
 
 	def SetUpWeapon(self):
+		"""
+		Set up the weapon image and hitboxes to be used later by the world.
+		"""
 		self.weaponImage = init.GRAPHICS['weapon']
 		self.weaponImage.set_colorkey((255, 0, 255))
 		self.weaponRect = self.weaponImage.get_rect()
@@ -100,6 +125,9 @@ class Player(pg.sprite.Sprite):
 		self.weaponHbox = pg.Rect(0, 0, 24 * c.ZOOM, 2 * c.ZOOM)
 
 	def LoadFrames(self):
+		"""
+		Load the graphics used for the animations for the player.
+		"""
 		spriteSheetRect = self.spriteSheet.get_rect()
 		tileWidth = int(spriteSheetRect.width / 16)
 		tileHeight = int(spriteSheetRect.height / 16)
@@ -115,6 +143,9 @@ class Player(pg.sprite.Sprite):
 				self.frames.append(newSurface)
 
 	def SetUpAnimations(self):
+		"""
+		Set up the animations that we will refer to later in the state handling.
+		"""
 		self.anims['idle-right'] = [0]
 		self.anims['idle-left'] = [1]
 		self.anims['death'] = [9]
@@ -125,6 +156,9 @@ class Player(pg.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		
 	def Update(self, keys, events):
+		"""
+		Main update loop, we need to handle the current state, input, animation, checking for events, and updating our persistant info.
+		"""
 		self.HandleState(keys, events)
 		self.Animation()
 		self.CheckForLevelUp()
@@ -134,6 +168,9 @@ class Player(pg.sprite.Sprite):
 			self.Invulnerable()
 
 	def UpdateInfo(self):
+		"""
+		Makes sure that the persistant info is updated.
+		"""
 		if self.HP < 0:
 			self.HP = 0
 		self.info["HP"] = self.HP
@@ -145,6 +182,9 @@ class Player(pg.sprite.Sprite):
 		self.info["SP"] = self.SP
 
 	def TakeDamage(self, damage):
+		"""
+		Function called when the world thinks we need to take damage.
+		"""
 		if self.damageInvuln == False:
 			init.SFX['hurt'].play()
 			self.damageInvuln = True
@@ -155,6 +195,9 @@ class Player(pg.sprite.Sprite):
 				self.velY -= 5
 
 	def Invulnerable(self):
+		"""
+		If we take damage, we need to avoid getting hit every frame. THis prevents that.
+		"""
 		if self.damageInvulnTimer == self.damageInvulnFrames:
 			self.damageInvuln = False
 			self.damageInvulnTimer = False
@@ -162,6 +205,9 @@ class Player(pg.sprite.Sprite):
 			self.damageInvulnTimer += 1
 
 	def HandleState(self, keys, events):
+		"""
+		Call different states based off of our current player state
+		"""
 		if self.state == c.IDLE:
 			self.Idle(keys,events)
 		elif self.state == c.WALKING:
@@ -178,6 +224,9 @@ class Player(pg.sprite.Sprite):
 			self.HandleSkillUp(keys, events)
 
 	def HandleSkillUp(self, keys, events):
+		"""
+		Handle input for spending skill points received when levelling up.
+		"""
 		for event in events:
 			if event.type == pg.KEYDOWN and self.canSpendSkills:
 				if keys[pg.K_1]:
@@ -203,6 +252,9 @@ class Player(pg.sprite.Sprite):
 						init.SFX['fail'].play()
 
 	def Death(self):
+		"""
+		IF we die, this function will be called over and over. Make sure we are still affected by gravity.
+		"""
 		self.velY += self.gravity
 		self.velX = 0
 		self.frameIndex = self.anims['death'][0]
@@ -236,6 +288,9 @@ class Player(pg.sprite.Sprite):
 					init.SFX['attack'].play()
 
 	def Walking(self, keys, events):
+		"""
+		Called when the player wants to move left or right. Handles animation and listens for jumping.
+		"""
 		self.velY += self.gravity
 
 		if(self.switchCounter == self.switchIndex):
@@ -284,6 +339,9 @@ class Player(pg.sprite.Sprite):
 					init.SFX['attack'].play()
 
 	def Jumping(self, keys, events):
+		"""
+		Listens for double jumping and applies a quick upward force to the player. Also alters gravity.
+		"""
 		self.allowJump = False
 		self.gravity = c.JUMP_GRAVITY
 		self.velY += self.gravity
@@ -316,6 +374,9 @@ class Player(pg.sprite.Sprite):
 					init.SFX['attack'].play()
 	
 	def DoubleJump(self, keys, events):
+		"""
+		Same as jump, but you can't jump out a doublejump.
+		"""
 		self.gravity = c.JUMP_GRAVITY
 		self.velY += self.gravity
 		self.velY += -0.2
@@ -341,6 +402,9 @@ class Player(pg.sprite.Sprite):
 					init.SFX['attack'].play()
 
 	def Attacking(self):
+		"""
+		Called when the player is attacking. Makes sure to change states around so that the world is informed of what we're doing.
+		"""
 		self.meleeActive = True
 		self.allowAttack = False
 		if self.meleeCounter == self.meleeTime:
@@ -352,6 +416,9 @@ class Player(pg.sprite.Sprite):
 			self.meleeCounter += 1
 
 	def Animation(self):
+		"""
+		Called every frame, changes our image to the correct frame based on our frameIndex.
+		"""
 		if self.damageInvuln == False or self.isDead:
 			self.image = self.frames[self.frameIndex]
 		else:

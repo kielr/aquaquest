@@ -1,3 +1,9 @@
+"""
+This Module contains the Options state class.
+"""
+
+__author__ = "kiel.regusters"
+
 import pygame as pg
 from .. import constants as c
 from .. import state
@@ -7,18 +13,26 @@ from .. import soundmanager
 from .. import debug
 
 class Options(state.State):
+	"""
+	This is the class for the main menu state. This is where the user will choose what to change in options.
+	"""
 	def __init__(self):
 		state.State.__init__(self)
 		self.StartUp(0.0)
 
 	def StartUp(self, currentTime):
-		""" Called everytime we switch to this state """
+		""" 
+		Called everytime we switch to this state 
+		"""
 		self.overhead = utility.Overhead(c.MAIN_MENU)
 		self.soundManager = soundmanager.Sound(self.overhead)
 		self.titlescreen = init.GRAPHICS['options']
 		self.SetupCursor()
 
 	def SetupCursor(self):
+		"""
+		Same as the main menu cursor set up, slightly different initial position
+		"""
 		self.cursor = pg.sprite.Sprite()
 		dest = (40, 60)
 
@@ -27,6 +41,12 @@ class Options(state.State):
 		self.cursor.state = c.MUSIC_MUTE
 
 	def GetImage(self, x, y, width, height, dest, spritesheet):
+		"""
+		@param x: the width of the image
+		@param y: the height of the image
+		@param dest: where to blit the sprite
+		@param spritesheet: the original image
+		"""
 		image = pg.Surface([width, height])
 		rect = image.get_rect()
 
@@ -40,6 +60,9 @@ class Options(state.State):
 		return (image, rect)
 	#
 	def UpdateCursor(self, keys, events):
+		"""
+		Called every frame and listens for user input to move the cursor around.
+		"""
 		positions = [60, 140]
 		input_list = [pg.K_SPACE, pg.K_RETURN, pg.K_e, pg.K_f]
 		for event in events:

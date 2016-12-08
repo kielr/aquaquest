@@ -29,6 +29,9 @@ class Overhead(object):
 		self.info = None
 
 	def CreateOrangeNumbers(self):
+		"""
+		Set up the dictionary containing orange font numbers.
+		"""
 		self.orangeDict = {}
 		count = 0
 		for i in range(21, 32):
@@ -36,6 +39,9 @@ class Overhead(object):
 			count += 1
 
 	def CreateTanNumbers(self):
+		"""
+		Set up the dictionary containing tan font numbers.
+		"""
 		self.tanDict = {}
 		count = 0
 		for i in range(405, 416):
@@ -43,6 +49,9 @@ class Overhead(object):
 			count += 1
 
 	def CreateBlueNumbers(self):
+		"""
+		Set up the dictionary containing blue font numbers.
+		"""
 		self.blueDict = {}
 		count = 0
 		for i in range(213, 224):
@@ -50,6 +59,9 @@ class Overhead(object):
 			count += 1
 
 	def CreateGreenNumbers(self):
+		"""
+		Set up the dictionary containing green font numbers.
+		"""
 		self.greenDict = {}
 		count = 0
 		for i in range(341, 352):
@@ -57,6 +69,9 @@ class Overhead(object):
 			count += 1
 
 	def CreateImageList(self):
+		"""
+		Load all of the frames we need from our font spritesheet.
+		"""
 		spriteSheetRect = self.spriteSheet.get_rect()
 		tileWidth = int(spriteSheetRect.width / 16)
 		tileHeight = int(spriteSheetRect.height / 16)
@@ -76,6 +91,9 @@ class Overhead(object):
 		self.blitLevelUp.blit(self.levelUpImage, (0,0))
 
 	def CreateLifeLabel(self):
+		"""
+		Create the life text that will be shown on the UI.
+		"""
 		letters = [self.frames[43], self.frames[40], self.frames[37], self.frames[36]]
 		self.lifeLabel = pg.Surface((64 * 3,16 * 3))
 		i = 0
@@ -86,6 +104,9 @@ class Overhead(object):
 			i += 16 * 2
 	
 	def CreateLVLLabel(self):
+		"""
+		Create the LVL text that will be shown on the UI.
+		"""
 		letters = [self.frames[43], self.frames[53], self.frames[43]]
 		self.lvlLabel = pg.Surface((64 * 3,16 * 3))
 		i = 0
@@ -96,6 +117,9 @@ class Overhead(object):
 			i += 16 * 2
 
 	def CreateSTRLabel(self):
+		"""
+		Create the STR text that will be shown on the UI.
+		"""
 		letters = [self.frames[434], self.frames[435], self.frames[433]]
 		self.STRLabel = pg.Surface((64 * 3,16 * 3))
 		i = 0
@@ -106,6 +130,9 @@ class Overhead(object):
 			i += 16 * 2
 
 	def CreateDEXLabel(self):
+		"""
+		Create the DEX text that will be shown on the UI.
+		"""
 		letters = [self.frames[355], self.frames[356], self.frames[375]]
 		self.DEXLabel = pg.Surface((64 * 3,16 * 3))
 		i = 0
@@ -116,6 +143,9 @@ class Overhead(object):
 			i += 16 * 2
 
 	def CreateINTLabel(self):
+		"""
+		Create the INT text that will be shown on the UI.
+		"""
 		letters = [self.frames[232], self.frames[237], self.frames[243]]
 		self.INTLabel = pg.Surface((64 * 3,16 * 3))
 		i = 0
@@ -126,9 +156,15 @@ class Overhead(object):
 			i += 16 * 2
 
 	def Update(self, info):
+		"""
+		Called every frame, update the player persistant info.
+		"""
 		self.UpdateInfo(info)
 
 	def UpdateInfo(self, info):
+		"""
+		Do the actual updating.
+		"""
 		self.info = info
 
 	def draw(self, surface):

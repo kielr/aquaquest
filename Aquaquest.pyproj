@@ -55,9 +55,6 @@
     <Compile Include="data\soundmanager.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="data\spritesheet.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="data\libs\util_pygame.py" />
     <Compile Include="data\libs\__init__.py" />
     <Compile Include="data\main.py">

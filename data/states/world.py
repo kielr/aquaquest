@@ -1,3 +1,7 @@
+"""
+This module contains the World state class and is where most of the game will be taking place
+"""
+
 __author__ = "kiel.regusters"
 import pygame as pg
 import os
@@ -16,7 +20,8 @@ from .. import enemy
 class World(state.State):
 	""" 
 	This class holds the TMX map and handles collision between entities inside the map.
-	It will also probably handle things like checkpoint and file IO for saving.
+	It will also probably handle things like checkpoint and file IO for saving. It also
+	has conversation with the player sprite class and all other entities inside of it.
 	"""
 	def __init__(self):
 		state.State.__init__(self)
@@ -27,6 +32,9 @@ class World(state.State):
 		self.waitTime = 120
 
 	def StartUp(self, currentTime):
+		"""
+		Called for a new game, loads the map, and sets up all the enemy, checkpoint, and trigger groups
+		"""
 		# The player got here from PLAY, so it's the first level.
 		self.currentTime = currentTime
 		debug.debug("Getting TMX file...")
@@ -48,6 +56,10 @@ class World(state.State):
 		self.DrawLevel()
 
 	def Transition(self, level):
+		"""
+		Called when the current object is transitioning to a new level. Similar to start up, but we don't need to
+		spawn the player, just move him.
+		"""
 		debug.debug("Transition level to {}".format(level))
 		debug.debug("Getting TMX file...")
 		self.tiledMap = util_pygame.load_pygame("resources/maps/" + level + ".tmx")
@@ -64,7 +76,8 @@ class World(state.State):
 
 	def Continue(self, currentTime, game_info):
 		"""
-		Method that is called whenever the user is continuing from checkpoint
+		Gamemanager loads game_info for us and from that we can determine where to put the player and what
+		stats to give him.
 		"""
 		debug.debug("Getting TMX file...")
 		self.tiledMap = util_pygame.load_pygame("resources/maps/" + game_info["level"] + ".tmx")
@@ -121,6 +134,9 @@ class World(state.State):
 		self.SetUpSolidGroup()
 
 	def SetUpSolidGroup(self):
+		"""
+		Sets up the level collidables so the player doesn't fall through.
+		"""
 		self.levelGroup = pg.sprite.Group()
 		for layer in self.tiledMap.layers:
 			if "Solid" in layer.name:
@@ -134,6 +150,10 @@ class World(state.State):
 					self.levelGroup.add(newSprite)
 
 	def TransitionPlayer(self, level):
+		"""
+		If the player reached the end of a level, we need to move him to the player spawn of the next.
+		This is what the method does.
+		"""
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
 		self.playerX = playerSpawnObject.x
 		self.playerY = playerSpawnObject.y
@@ -145,6 +165,9 @@ class World(state.State):
 		self.player.info['level'] = "level2"
 
 	def SpawnPlayer(self):
+		"""
+		This method is called if the player is starting a new game. Thus we create a newGameInfo dict and pass into a new player class.
+		"""
 		# Find where player should spawn
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
 		self.playerX = playerSpawnObject.x
@@ -165,6 +188,10 @@ class World(state.State):
 		self.player.relY = self.playerY * c.ZOOM
 
 	def SpawnPlayerContinue(self, x, y, game_info):
+		"""
+		This method is called if the player selected the Continue option from the Main menu state class. game_info is loaded
+		in the game manager and given to the world so that we can pull important persistant information that was saved to the file.
+		"""
 		self.playerX = x
 		self.playerY = y
 		self.camera.LookAt((self.playerX*c.ZOOM, self.playerY*c.ZOOM))
@@ -185,6 +212,10 @@ class World(state.State):
 		self.soundManager.Update()
 
 	def HandleStates(self, keys, events):
+		"""
+		Originally meant to handle multiple states of the game but there ended up being only one because pause was never
+		implemented.
+		"""
 		# Cheats for dev and grader
 		for event in events:
 			if event.type == pg.QUIT:
@@ -210,7 +241,11 @@ class World(state.State):
 			self.UpdateAllSprites(keys, events)
 
 	def UpdateAllSprites(self, keys, events):
+		"""
+		This is where most of the magic of the game will happen.
 
+		Handles the map collision for every entity, including weapon and magic collision.
+		"""
 		# Update Player
 		self.CheckPlayerDeath()
 		self.player.Update(keys, events)
@@ -257,33 +292,51 @@ class World(state.State):
 			self.CheckGameover()
 
 	def CheckGameover(self):
+		"""
+		Checks to see if the player collided with the gameover object.
+		"""
 		if self.player.rect.colliderect([self.gameoverObject.x*c.ZOOM - self.camera.x, self.gameoverObject.y*c.ZOOM - self.camera.y,
 								   self.gameoverObject.width*c.ZOOM, self.gameoverObject.height*c.ZOOM]):
 			self.done = True
 			self.next = c.GAMEOVER
 
 	def MoveEnemiesX(self):
+		"""
+		Move all enemies on the x axis.
+		"""
 		for enemy in self.enemyGroup.sprites():
 			enemy.relX += enemy.velX
 			enemy.rect.x = enemy.relX - self.camera.x
 
 	def MoveEnemiesY(self):
+		"""
+		Move all enemies on the y axis.
+		"""
 		for enemy in self.enemyGroup.sprites():
 			enemy.relY += enemy.velY
 			enemy.rect.y = enemy.relY - self.camera.y
 
 	def MoveCheckpoint(self):
+		"""
+		Adjust the checkpoints based off the camera position.
+		"""
 		for checkpoint in self.checkpointGroup.sprites():
 			checkpoint.Update()
 			checkpoint.rect.x = checkpoint.relX - self.camera.x
 			checkpoint.rect.y = checkpoint.relY - self.camera.y
 
 	def MoveTriggers(self):
+		"""
+		Adjust the triggers based off the camera position.
+		"""
 		for trigger in self.levelTriggerGroup.sprites():
 			trigger.rect.x = trigger.relX - self.camera.x
 			trigger.rect.y = trigger.relY - self.camera.y
 
 	def MoveFireball(self):
+		"""
+		Adjust the player spells based off the camera position.
+		"""
 		for fireball in self.fireballGroup.sprites():
 			fireball.Lifetime()
 			if fireball.life <= (0 - self.player.INT * 1.5):
@@ -301,6 +354,10 @@ class World(state.State):
 			fireball.hurtbox[1] = fireball.rect.y
 	
 	def CheckPlayerDeath(self):
+		"""
+		Listen for the player object telling us that the player is dead. If the player is dead
+		then we will wait for a little bit and send the user back to the main menu.
+		"""
 		if self.player.isDead and self.playerIsDead == False:
 			debug.debug("Player death.")
 			self.playerIsDead = True
@@ -315,12 +372,19 @@ class World(state.State):
 			self.waitCount += 1
 
 	def CheckTriggerCollision(self):
+		"""
+		Check to see if the player is colliding with a trigger.
+		"""
 		trigger = pg.sprite.spritecollideany(self.player, self.levelTriggerGroup)
 
 		if trigger:
 			self.Transition(trigger.name)
 
 	def CheckPlayerCheckpointCollisions(self):
+		"""
+		Check to see if the player has collided with a checkpoint, if they do, open a file for writing and save the
+		persistant game info to the file.
+		"""
 		checkpointSprite = pg.sprite.spritecollideany(self.player, self.checkpointGroup)
 
 		if checkpointSprite:
@@ -331,14 +395,21 @@ class World(state.State):
 				f = open("save", "w")
 				for key in self.player.info.keys():
 					f.write("{} {}\n".format(key, self.player.info[key]))
+				f.close()
 
 	def CheckPlayerXLevelCollisions(self):
+		"""
+		Check player to level collisions on the X-axis
+		"""
 		tile = pg.sprite.spritecollideany(self.player, self.levelGroup)
 
 		if tile:
 			self.ResolveXLevelCollisions(self.player, tile)
 
 	def CheckPlayerYLevelCollisions(self):
+		"""
+		Check player to level collisions on the Y-axis
+		"""
 		tile = pg.sprite.spritecollideany(self.player, self.levelGroup)
 
 		if tile:
@@ -346,6 +417,9 @@ class World(state.State):
 			self.player.allowJump = True
 
 	def CheckEnemyYLevelCollisions(self):
+		"""
+		Check enemy to level collisions on the Y-axis
+		"""
 		for enemies in self.enemyGroup.sprites():
 			tile = pg.sprite.spritecollideany(enemies, self.levelGroup)
 
@@ -353,6 +427,11 @@ class World(state.State):
 				self.ResolveYLevelCollisions(enemies, tile)
 
 	def CheckEnemySwordCollisions(self):
+		"""
+		Check enemy to sword collisions. If there is a collision AND the player is in the attacking state
+		then we need to decrement the enemy's health and check to see if they died. If they died, give the player
+		experience.
+		"""
 		if self.player.attackState == c.ATTACKING:
 			for enemies in self.enemyGroup.sprites():
 				if enemies.rect.colliderect(self.player.weaponHbox) and enemies.isDead == False:
@@ -362,6 +441,10 @@ class World(state.State):
 						self.player.XP += 25
 
 	def CheckEnemyFireballCollisions(self):
+		"""
+		Check enemy to fireball collisions. After that, the same process for checking damage and death as
+		the enemy to sword collisions.
+		"""
 		for enemies in self.enemyGroup.sprites():
 			fireball = pg.sprite.spritecollideany(enemies, self.fireballGroup)
 
@@ -372,11 +455,20 @@ class World(state.State):
 					self.player.XP += 25
 	
 	def CheckEnemyPlayerCollision(self):
+		"""
+		Check to see if the enemy collided with the player, if they did, deal damage to the player.
+		"""
 		zombie = pg.sprite.spritecollideany(self.player, self.enemyGroup)
 		if zombie and zombie.isDead == False:
 			self.player.TakeDamage(25)
 
 	def ResolveXLevelCollisions(self, entity, collider):
+		"""
+		@param entity: offending entity
+		@param collider: the tile that the entity collided with.
+
+		Resolve all collisions with the level between the tile and the entity provided on the x-axis.
+		"""
 		if entity.velX > 0: # Going right
 			intersectDepth = collider.rect.left - self.player.rect.right
 			if intersectDepth < (-16*3):
@@ -396,6 +488,12 @@ class World(state.State):
 			entity.rect.x = entity.relX - self.camera.x
 
 	def ResolveYLevelCollisions(self, entity, collider):
+		"""
+		@param entity: offending entity
+		@param collider: the tile that the entity collided with.
+
+		Resolve all collisions with the level between the tile and the entity provided on the y-axis.
+		"""
 		if entity.velY > 0: # Going Down
 			intersectDepth = collider.rect.top - entity.rect.bottom
 			if intersectDepth < (-16*3):
@@ -417,6 +515,9 @@ class World(state.State):
 			entity.velY = 0
 
 	def MovePlayerX(self):
+		"""
+	    Move the player on the x-axis.
+		"""
 		self.player.relX += self.player.velX
 		self.player.rect.x = self.player.relX - self.camera.x
 		if self.player.facingRight:
@@ -425,13 +526,17 @@ class World(state.State):
 			self.player.weaponHbox.x = self.player.rect.x - 71
 	
 	def MovePlayerY(self):
+		"""
+	    Move the player on the y-axis.
+		"""
 		self.player.relY += self.player.velY
 		self.player.rect.y = self.player.relY - self.camera.y
 		self.player.weaponHbox.y = self.player.rect.y + 22
 	
 	def UpdateCameraX(self):
-		# Look at the player
-		#self.camera.LookAtX(self.player.relx)
+		"""
+		Move the camera on the x-axis
+		"""
 
 		third = self.camera.viewport.x + self.camera.viewport.w//3
 		third2 = third * 2
@@ -442,10 +547,17 @@ class World(state.State):
 			self.camera.Move(self.player.velX, 0)
 
 	def UpdateCameraY(self):
+		"""
+		Move the camera on the y-axis.
+		"""
 		# Look at the player
 		self.camera.LookAtY(self.player.relY + 75)
 
 	def DrawLevel(self):
+		"""
+		Draw the level to a pygame surface once, and use that to draw the main surface of the game. If we draw again every frame
+		then it will be very expensive and taxing on the computer.
+		"""
 		self.levelSurface.fill(c.BLACK)
 		for layer in self.tiledMap.layers:
 			if "Object" not in str(type(layer)):
@@ -456,6 +568,10 @@ class World(state.State):
 												[c.TILE_SIZE * c.ZOOM * x, c.TILE_SIZE * c.ZOOM * y])
 
 	def DrawEverything(self, surface):
+		"""
+		This method is called every frame and draws all things that need to be seen by the player.
+		It also contains a debug drawing if the DEBUG_DRAW flag is true
+		"""
 		self.SetUpSolidGroup()
 		#Draw player
 		# Draw to the surface

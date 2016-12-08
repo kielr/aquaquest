@@ -1,8 +1,8 @@
-__author__ = "kiel.regusters"
-
 """
 Module that holds the LoadScreen state class.
 """
+
+__author__ = "kiel.regusters"
 
 import pygame as pg
 from .. import state
@@ -14,11 +14,16 @@ from .. import debug
 class Continue(state.State):
 	"""
 	This class handles the loading screen animation. It doesn't actually do the loading, it is only for show.
+	Slightly different from the loading state in that self.next is set to c.LOADMAP to let the gamemanager know to load
+	a save file instead of a new game.
 	"""
 	def __init__(self):
 		state.State.__init__(self)
 	
 	def StartUp(self, currentTime):
+		"""
+		The initial function called on every state. Sets up overhead info, soundmanager, and graphics if necessary
+		"""
 		self.startTime = currentTime
 		self.next = c.LOADMAP
 		self.overhead = utility.Overhead(c.LOAD_SCREEN)

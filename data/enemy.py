@@ -1,3 +1,7 @@
+"""
+This module contains the information needed to create working enemies.
+"""
+
 __author___ = "kiel.regusters"
 import pygame as pg
 from . import constants as c
@@ -5,6 +9,9 @@ from . import init, gamemanager
 from itertools import cycle
 
 class Enemy(pg.sprite.Sprite):
+	"""
+	The base enemy class. If you want to make a new enemy type you can just inherit from this and change a few things.
+	"""
 	def __init__(self, name):
 		pg.sprite.Sprite.__init__(self)
 		self.spriteSheet = init.GRAPHICS[name]
@@ -21,6 +28,9 @@ class Enemy(pg.sprite.Sprite):
 		self.SetUpStats()
 
 	def LoadFrames(self):
+		"""
+		Loads the frames for the enemy animations.
+		"""
 		spriteSheetRect = self.spriteSheet.get_rect()
 		tileWidth = int(spriteSheetRect.width / 16)
 		tileHeight = int(spriteSheetRect.height / 16)
@@ -39,6 +49,9 @@ class Enemy(pg.sprite.Sprite):
 		pass
 
 	def SetUpStats(self):
+		"""
+		Sets up the various stats for the enemy
+		"""
 		self.HP = 100
 		self.XPreward = 25
 		self.isDead = False
@@ -47,6 +60,9 @@ class Enemy(pg.sprite.Sprite):
 		self.damageInvulnTimer = 0
 
 	def SetUpForces(self):
+		"""
+		Sets up the forces akin to the way the player's forces are set up.
+		"""
 		self.velX = 0
 		self.velY = 0
 		self.maxVelX = c.MAX_VEL_X
@@ -55,9 +71,15 @@ class Enemy(pg.sprite.Sprite):
 		self.accelX = c.ACCEL
 
 	def Update(self):
+		"""
+		Main update, it does nothing in this base class. It must be overriden.
+		"""
 		pass
 
 	def CheckForDeath(self):
+		"""
+		Check for the death of the enemy. If the health reaches 0 or below then set the state to dead.
+		"""
 		if(self.HP <= 0):
 			self.isDead = True
 			self.state = c.DEAD
@@ -74,7 +96,13 @@ class Enemy(pg.sprite.Sprite):
 				self.image = self.frames[self.anims["invisible"][0]]
 
 class Zombie(Enemy):
+	"""
+	The main enemy used in the game
+	"""
 	def __init__(self, name):
+		"""
+		@param name: used to determine what graphics to load for the enemy. THis makes it easier to add enemies in later for enemies whose assets are made.
+		"""
 		Enemy.__init__(self, name)
 		self.turnAroundFrames = 120
 		self.turnAroundCurrent = 0
@@ -82,6 +110,9 @@ class Zombie(Enemy):
 		self.velX = 2.5
 
 	def SetUpAnimations(self):
+		"""
+		set up all the animations for the zombie
+		"""
 		self.anims['idle-right'] = [0]
 		self.anims['idle-left'] = [1]
 		self.anims['death'] = [9]
@@ -92,6 +123,9 @@ class Zombie(Enemy):
 		self.rect = self.image.get_rect()
 
 	def Update(self):
+		"""
+		Main update loop for the zombie. Do different things dependent on the state.
+		"""
 		if self.state == c.WALKING:
 			self.Patrol()
 		if self.state == c.DEAD:
@@ -100,11 +134,17 @@ class Zombie(Enemy):
 		self.Animation()
 
 	def Death(self):
+		"""
+		Function called if this zombie is dead. Set the frame to the death frame and apply gravity.
+		"""
 		self.velY += self.gravity
 		self.velX = 0
 		self.frameIndex = self.anims['death'][0]
 
 	def TakeDamage(self, damage):
+		"""
+		Method called by the world when it decides that the zombie needs to take damage.
+		"""
 		if self.damageInvuln == False:
 			init.SFX['hurt'].play()
 			self.damageInvuln = True
@@ -115,6 +155,9 @@ class Zombie(Enemy):
 				self.velY -= 5
 
 	def Invulnerable(self):
+		"""
+		Method called to check and apply invulnerability of we've taken damage recently.
+		"""
 		if self.damageInvulnTimer == self.damageInvulnFrames:
 			self.damageInvuln = False
 			self.damageInvulnTimer = False
@@ -122,6 +165,9 @@ class Zombie(Enemy):
 			self.damageInvulnTimer += 1
 
 	def Patrol(self):
+		"""
+		Default state of the zombie. Walk bak and forth and make sure to change our sprite based on direction.
+		"""
 		self.velY += self.gravity
 
 		if(self.switchCounter == self.switchIndex):

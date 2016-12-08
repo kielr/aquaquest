@@ -1,8 +1,9 @@
+"""
+Module that holds the Gameover state class.
+"""
+
 __author__ = "kiel.regusters"
 
-"""
-Module that holds the LoadScreen state class.
-"""
 
 import pygame as pg
 from .. import state
@@ -20,6 +21,9 @@ class GameOver(state.State):
 		state.State.__init__(self)
 	
 	def StartUp(self, currentTime):
+		"""
+		The initial function called on every state. Sets up overhead info, soundmanager, and graphics if necessary
+		"""
 		self.startTime = currentTime
 		self.next = c.MAIN_MENU
 		self.overhead = utility.Overhead(c.GAMEOVER)

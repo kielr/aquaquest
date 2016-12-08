@@ -1,7 +1,10 @@
+"""
+The module of the main game manager of the project. Contains the GameManager class that keeps track of the current state of the game.
+"""
+
 __author__ = "kiel.regusters"
 from . import debug
 from . import init
-from . import spritesheet
 from . states import world
 from . import debug
 from . import constants as c
@@ -43,6 +46,9 @@ class GameManager(object):
 
 	
 	def SetupStates(self, stateDict, startState):
+		"""
+		Sets up the state dictionary for the game.
+		"""
 		self.stateDict = stateDict
 		self.stateName = startState
 		self.state = self.stateDict[self.stateName]

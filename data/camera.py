@@ -6,6 +6,10 @@ Module for a camera object that lets us change what the viewport sees.
 from . import init
 import pygame as pg
 class Camera(object):
+	"""
+	Very important class. Ensures that the player an always see the character.
+	"""
+
 	def __init__(self):
 		self.viewport = init.SCREEN.get_rect()
 		self.x = self.viewport.x
@@ -22,32 +26,36 @@ class Camera(object):
 	#			self.orgX -= 1
 
 	def LookAt(self, vector):
+		"""
+		Sets the camera to the provided (x,y) format vector.
+		"""
 		self.x = int(vector[0] - self.viewport.width / 2)
 		self.y = int(vector[1] - self.viewport.height / 2)
 		self.orgX = int(self.x + self.viewport.width / 2)
 		self.orgY = int(self.y + self.viewport.height / 2)
 
 	def LookAtX(self, x):
+		"""
+		Sets the camera's x coordinate to the provided x parameter.
+		"""
 		self.x = int(x - self.viewport.width / 2)
 		self.orgX = int(self.x + self.viewport.width / 2)
 
 	def LookAtY(self, y):
+		"""
+		Sets the camera's y coordinate to the provided x parameter.
+		"""
 		self.y = int(y - self.viewport.width / 2)
 		self.orgY = int(self.y + self.viewport.width / 2)
 
 
-	def LerpLookAt(self, vector, t):
-		frompos = pg.math.Vector2(self.x, self.y)
-		target = pg.math.Vector2(vector[0] - self.viewport.width / 2, vector[1] - self.viewport.height / 2)
-		lerpTarget = pg.math.Vector2.lerp(frompos, target, t)
-
-		self.x = int(lerpTarget.x)
-		self.y = int(lerpTarget.y)
-		self.orgX = int(self.x + self.viewport.width / 2)
-		self.orgY = int(self.y + self.viewport.height / 2)
-
-
 	def Move(self, x, y):
+		"""
+		@param x: x-axis amount to move
+		@param y: y-axis amount to move
+
+		Moves the camera.
+		"""
 		self.x += x
 		self.y += y
 		self.orgX += x
