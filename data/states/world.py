@@ -11,6 +11,7 @@ from .. import debug
 from .. import init
 from .. import camera
 from .. import player, fireball, checkpoint, level_transition_trigger
+from .. import enemy
 
 class World(state.State):
 	""" 
@@ -90,6 +91,7 @@ class World(state.State):
 		self.fireballGroup = pg.sprite.Group()
 		self.checkpointGroup = pg.sprite.Group()
 		self.levelTriggerGroup = pg.sprite.Group()
+		self.enemyGroup = pg.sprite.Group()
 		i = 1
 
 		for checkpointObject in self.tiledMap.get_layer_by_name("checkpoints"):
@@ -103,6 +105,13 @@ class World(state.State):
 			newTrigger = level_transition_trigger.Trigger(triggerObject.x * c.ZOOM, triggerObject.y * c.ZOOM)
 			newTrigger.name = triggerObject.name
 			self.levelTriggerGroup.add(newTrigger)
+
+		for enemies in self.tiledMap.get_layer_by_name("enemy"):
+			if "zombie" in enemies.name:
+				newEnemy = enemy.Zombie(enemies.name)
+				newEnemy.relX = enemies.x * c.ZOOM
+				newEnemy.relY = enemies.y * c.ZOOM
+				self.enemyGroup.add(newEnemy)
 		self.SetUpSolidGroup()
 
 	def SetUpSolidGroup(self):
@@ -122,6 +131,7 @@ class World(state.State):
 		playerSpawnObject = self.tiledMap.get_object_by_name("playerSpawn")
 		self.playerX = playerSpawnObject.x
 		self.playerY = playerSpawnObject.y
+		self.camera.LookAt((self.playerX*c.ZOOM, self.playerY*c.ZOOM))
 		self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
 		self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
 		self.player.relX = self.playerX * c.ZOOM
@@ -151,6 +161,7 @@ class World(state.State):
 	def SpawnPlayerContinue(self, x, y, game_info):
 		self.playerX = x
 		self.playerY = y
+		self.camera.LookAt((self.playerX*c.ZOOM, self.playerY*c.ZOOM))
 		self.player = player.Player(game_info)
 		self.player.rect.x = self.playerX * c.ZOOM - self.camera.x
 		self.player.rect.y = self.playerY * c.ZOOM - self.camera.y
@@ -168,6 +179,7 @@ class World(state.State):
 		self.soundManager.Update()
 
 	def HandleStates(self, keys, events):
+		# Cheats for dev and grader
 		for event in events:
 			if event.type == pg.QUIT:
 				debug.debug("Player quitting...")
@@ -185,23 +197,43 @@ class World(state.State):
 					self.player.TakeDamage(50)
 				if keys[pg.K_F3]:
 					self.player.HP += 50
-
 		if keys[pg.K_F4]:
 			self.player.XP += 10
+
 		if self.state == c.UNPAUSE:
 			self.UpdateAllSprites(keys, events)
 
 	def UpdateAllSprites(self, keys, events):
-		# Player
+
+		# Update Player
 		self.CheckPlayerDeath()
 		self.player.Update(keys, events)
 		self.MovePlayerX()
 		self.CheckPlayerXLevelCollisions()
-		self.UpdateCameraX()
 		self.MovePlayerY()
 		self.CheckPlayerYLevelCollisions()
-		self.UpdateCameraY()
+		self.CheckEnemyYLevelCollisions()
+
+		self.CheckEnemyPlayerCollision()
+
 		self.overhead.Update(self.player.info)
+		
+		# Update Enemies
+		for enemies in self.enemyGroup.sprites():
+			enemies.Update()
+
+		self.MoveEnemiesX()
+		self.MoveEnemiesY()
+
+		# Update Camera
+		self.UpdateCameraX()
+		self.UpdateCameraY()
+
+
+		# Enemies
+		self.CheckEnemySwordCollisions()
+		self.CheckEnemyFireballCollisions()
+
 
 		# Fireball
 		self.MoveFireball()
@@ -213,6 +245,16 @@ class World(state.State):
 		# Triggers
 		self.CheckTriggerCollision()
 		self.MoveTriggers()
+
+	def MoveEnemiesX(self):
+		for enemy in self.enemyGroup.sprites():
+			enemy.relX += enemy.velX
+			enemy.rect.x = enemy.relX - self.camera.x
+
+	def MoveEnemiesY(self):
+		for enemy in self.enemyGroup.sprites():
+			enemy.relY += enemy.velY
+			enemy.rect.y = enemy.relY - self.camera.y
 
 	def MoveCheckpoint(self):
 		for checkpoint in self.checkpointGroup.sprites():
@@ -278,76 +320,114 @@ class World(state.State):
 		tile = pg.sprite.spritecollideany(self.player, self.levelGroup)
 
 		if tile:
-			self.ResolvePlayerXLevelCollisions(tile)
+			self.ResolveXLevelCollisions(self.player, tile)
 
 	def CheckPlayerYLevelCollisions(self):
 		tile = pg.sprite.spritecollideany(self.player, self.levelGroup)
 
 		if tile:
-			self.ResolvePlayerYLevelCollisions(tile)
+			self.ResolveYLevelCollisions(self.player, tile)
 			self.player.allowJump = True
 
-	def ResolvePlayerXLevelCollisions(self, collider):
-		if self.player.velX > 0: # Going right
+	def CheckEnemyYLevelCollisions(self):
+		for enemies in self.enemyGroup.sprites():
+			tile = pg.sprite.spritecollideany(enemies, self.levelGroup)
+
+			if tile:
+				self.ResolveYLevelCollisions(enemies, tile)
+
+	def CheckEnemySwordCollisions(self):
+		if self.player.attackState == c.ATTACKING:
+			for enemies in self.enemyGroup.sprites():
+				if enemies.rect.colliderect(self.player.weaponHbox) and enemies.isDead == False:
+					enemies.TakeDamage(50 + self.player.STR * 10)
+					enemies.CheckForDeath()
+					if enemies.isDead:
+						self.player.XP += 25
+
+	def CheckEnemyFireballCollisions(self):
+		for enemies in self.enemyGroup.sprites():
+			fireball = pg.sprite.spritecollideany(enemies, self.fireballGroup)
+
+			if fireball and enemies.isDead == False:
+				enemies.TakeDamage(15 + self.player.INT * 2)
+				enemies.CheckForDeath()
+				if enemies.isDead:
+					self.player.XP += 25
+	
+	def CheckEnemyPlayerCollision(self):
+		zombie = pg.sprite.spritecollideany(self.player, self.enemyGroup)
+		if zombie and zombie.isDead == False:
+			self.player.TakeDamage(25)
+
+	def ResolveXLevelCollisions(self, entity, collider):
+		if entity.velX > 0: # Going right
 			intersectDepth = collider.rect.left - self.player.rect.right
 			if intersectDepth < (-16*3):
 				return
 
 			# Correct the position
-			self.player.relX += intersectDepth
-			self.player.rect.x = self.player.relX - self.camera.x
+			entity.relX += intersectDepth
+			entity.rect.x = entity.relX - self.camera.x
 
-		elif self.player.velX < 0: # Going left
+		elif entity.velX < 0: # Going left
 			intersectDepth = collider.rect.right - self.player.rect.left
 			if intersectDepth > 16*3:
 				return
 
 			# Correct the position
-			self.player.relX += intersectDepth
-			self.player.rect.x = self.player.relX - self.camera.x
+			entity.relX += intersectDepth
+			entity.rect.x = entity.relX - self.camera.x
 
-	def ResolvePlayerYLevelCollisions(self, collider):
-		if self.player.velY > 0: # Going Down
-			intersectDepth = collider.rect.top - self.player.rect.bottom
+	def ResolveYLevelCollisions(self, entity, collider):
+		if entity.velY > 0: # Going Down
+			intersectDepth = collider.rect.top - entity.rect.bottom
 			if intersectDepth < (-16*3):
 				return
 
 			# Correct the position
-			self.player.relY += intersectDepth
-			self.player.rect.y = self.player.relY - self.camera.y
-			self.player.velY = 0
+			entity.relY += intersectDepth
+			entity.rect.y = entity.relY - self.camera.y
+			entity.velY = 0
 
 		elif self.player.velY < 0: # Going Up
-			intersectDepth = collider.rect.bottom - self.player.rect.top
+			intersectDepth = collider.rect.bottom - entity.rect.top
 			if intersectDepth > 16*3:
 				return
 
 			# Correct the position
-			self.player.relY += intersectDepth
-			self.player.rect.y = self.player.relY - self.camera.y
-			self.player.velY = 0
+			entity.relY += intersectDepth
+			entity.rect.y = entity.relY - self.camera.y
+			entity.velY = 0
 
 	def MovePlayerX(self):
 		self.player.relX += self.player.velX
 		self.player.rect.x = self.player.relX - self.camera.x
+		if self.player.facingRight:
+			self.player.weaponHbox.x = self.player.rect.x + 50
+		else:
+			self.player.weaponHbox.x = self.player.rect.x - 71
 	
 	def MovePlayerY(self):
 		self.player.relY += self.player.velY
 		self.player.rect.y = self.player.relY - self.camera.y
+		self.player.weaponHbox.y = self.player.rect.y + 22
 	
 	def UpdateCameraX(self):
 		# Look at the player
-		if self.player.facingRight:
-			self.camera.LookAtX(self.player.relX)
-		else:
-			self.camera.LookAtX(self.player.relX)
+		#self.camera.LookAtX(self.player.relx)
+
+		third = self.camera.viewport.x + self.camera.viewport.w//3
+		third2 = third * 2
+
+		if self.player.velX < 0 and self.player.rect.centerx <= third:
+			self.camera.Move(self.player.velX, 0)
+		elif self.player.velX > 0 and self.player.rect.centerx >= third2:
+			self.camera.Move(self.player.velX, 0)
 
 	def UpdateCameraY(self):
 		# Look at the player
-		if self.player.facingRight:
-			self.camera.LookAtY(self.player.relY + 75)
-		else:
-			self.camera.LookAtY(self.player.relY + 75)
+		self.camera.LookAtY(self.player.relY + 75)
 
 	def DrawLevel(self):
 		self.levelSurface.fill(c.BLACK)
@@ -363,7 +443,10 @@ class World(state.State):
 		self.SetUpSolidGroup()
 		#Draw player
 		# Draw to the surface
+
 		surface.blit(self.levelSurface, (0,0), [0 + self.camera.x, 0+self.camera.y, self.camera.viewport.width, self.camera.viewport.height])
+		# Draw Enemies
+		self.enemyGroup.draw(surface)
 
 		# Draw player
 		self.playerGroup.draw(surface)
@@ -400,11 +483,12 @@ class World(state.State):
 
 			for trigger in self.levelTriggerGroup.sprites():
 				pg.draw.rect(surface, (0, 255, 255), trigger.rect)
+
+			for enemy in self.enemyGroup.sprites():
+				pg.draw.rect(surface, (200, 20, 20), enemy.rect)
 			
 			if self.player.attackState == c.ATTACKING:
 				if self.player.facingRight:
-					pg.draw.rect(surface, (255,0,0), [self.player.rect.x + 50, self.player.rect.y + 23,
-									  self.player.weaponHbox.w, self.player.weaponHbox.h])
+					pg.draw.rect(surface, (255,0,0), self.player.weaponHbox)
 				else:
-					pg.draw.rect(surface, (255,0,0), [self.player.rect.x - 71, self.player.rect.y + 23,
-									  self.player.weaponHbox.w, self.player.weaponHbox.h])
+					pg.draw.rect(surface, (255,0,0), self.player.weaponHbox)

@@ -88,6 +88,9 @@
     <Compile Include="data\states\world.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="data\enemy.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="data\__init__.py">
       <SubType>Code</SubType>
     </Compile>

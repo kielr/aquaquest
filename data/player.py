@@ -149,7 +149,10 @@ class Player(pg.sprite.Sprite):
 			init.SFX['hurt'].play()
 			self.damageInvuln = True
 			self.HP -= damage
-
+			if self.facingRight:
+				self.velY -= 5
+			else:
+				self.velY -= 5
 
 	def Invulnerable(self):
 		if self.damageInvulnTimer == self.damageInvulnFrames:
@@ -157,6 +160,7 @@ class Player(pg.sprite.Sprite):
 			self.damageInvulnTimer = False
 		else:
 			self.damageInvulnTimer += 1
+
 	def HandleState(self, keys, events):
 		if self.state == c.IDLE:
 			self.Idle(keys,events)
@@ -346,7 +350,6 @@ class Player(pg.sprite.Sprite):
 			self.meleeCounter = 0
 		else:
 			self.meleeCounter += 1
-
 
 	def Animation(self):
 		if self.damageInvuln == False or self.isDead:

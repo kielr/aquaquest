@@ -6,8 +6,6 @@ from . states import world
 from . import debug
 from . import constants as c
 import pygame as pg
-import pytmx
-from util_pygame import load_pygame
 
 class GameManager(object):
 	""" This class is the main control class for the entire project. It handles the main game loop,
