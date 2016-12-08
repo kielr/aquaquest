@@ -27,7 +27,7 @@ After getting to the correct aquaquest directory with setup.py:
 
 python setup.py build
 python setup.py install - if you have root priviledges
-sudo python setup.py install - if you don't
+sudo python setup.py install - if you don't have root priviledges
 
 //////////////////////////////////////
 ///////////////USAGE//////////////////
@@ -35,6 +35,12 @@ sudo python setup.py install - if you don't
 After it is done installing, to run the game simple type the following command into console:
 
 python -m aquaquest_play
+
+If for some reason you are having trouble using the setup.py installer you can also just run it
+from the sdist directory directly like so:
+
+(while in sdist directory of project)
+python aquaquest_play.py
 
 //////////////////////////////////////
 /////////////CONTROLS/////////////////

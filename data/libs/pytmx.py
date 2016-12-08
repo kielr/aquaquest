@@ -2,7 +2,7 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
-import six
+from . import six
 import os
 from itertools import chain, product
 from collections import defaultdict, namedtuple
