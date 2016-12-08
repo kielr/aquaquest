@@ -1,9 +1,9 @@
-checkpoint 3
-HP 75
-INT 4
-STR 2
 LVL 8
-DEX 1
+SP 0
+INT 5
+HP 25
+STR 1
+checkpoint 3
+DEX 2
 level level2
-XP 50
-SP 1
+XP 25

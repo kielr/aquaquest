@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="28">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="50" height="50" tilewidth="16" tileheight="16" nextobjectid="30">
  <tileset firstgid="1" name="deepcave" tilewidth="16" tileheight="16" tilecount="8" columns="8">
   <image source="../tilesets/deepcave.png" width="128" height="16"/>
  </tileset>
@@ -134,5 +134,8 @@
   <object id="25" name="zombie" x="357" y="702" width="16" height="16"/>
   <object id="26" name="zombie" x="400" y="704" width="16" height="16"/>
   <object id="27" name="zombie" x="535" y="701" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="gameover">
+  <object id="29" name="gameover" x="688" y="672" width="16" height="48"/>
  </objectgroup>
 </map>

@@ -92,6 +92,12 @@ class World(state.State):
 		self.checkpointGroup = pg.sprite.Group()
 		self.levelTriggerGroup = pg.sprite.Group()
 		self.enemyGroup = pg.sprite.Group()
+		self.noGameover = True
+		try:
+			self.gameoverObject = self.tiledMap.get_object_by_name("gameover")
+			self.noGameover = False
+		except:
+			debug.debug("No gameover object found.")
 		i = 1
 
 		for checkpointObject in self.tiledMap.get_layer_by_name("checkpoints"):
@@ -245,6 +251,16 @@ class World(state.State):
 		# Triggers
 		self.CheckTriggerCollision()
 		self.MoveTriggers()
+
+		# Gameover
+		if self.noGameover == False:
+			self.CheckGameover()
+
+	def CheckGameover(self):
+		if self.player.rect.colliderect([self.gameoverObject.x*c.ZOOM - self.camera.x, self.gameoverObject.y*c.ZOOM - self.camera.y,
+								   self.gameoverObject.width*c.ZOOM, self.gameoverObject.height*c.ZOOM]):
+			self.done = True
+			self.next = c.GAMEOVER
 
 	def MoveEnemiesX(self):
 		for enemy in self.enemyGroup.sprites():

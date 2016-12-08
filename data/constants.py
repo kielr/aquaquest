@@ -37,6 +37,7 @@ LOAD_SCREEN = "load screen"
 MAP = "map"
 CONTINUE = "continue"
 LOADMAP = "loadmap"
+GAMEOVER = "gameover"
 MUTE = False
 
 # Real Time States
