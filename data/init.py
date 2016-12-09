@@ -10,7 +10,6 @@ from . import load
 from . import debug
 path = os.path.abspath(__file__)
 dir_path = os.path.dirname(path)
-print(dir_path)
 # Control where the window for the game is created
 os.environ["SDL_VIDEO_CENTERED"] = "1"
 
